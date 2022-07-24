@@ -2,20 +2,20 @@ from prob_builder import *
 from typing import List
 PENALTY = 1000000
 
-def rule_solver(instance: Prob_Instance) -> dict:
+def rule_solver(instance: Prob_Instance) -> dict: # 반환값이 dict라는 걸 의미한다.
     print('Solver Start')
     solution = {}
-    solution['Problem'] = instance.deepcopy()
+    solution['Problem'] = instance.deepcopy() # 문제정의,,?
 
     req_list = instance.req_list
     req: Request
     for req in req_list:
-        req.initialize()
+        req.initialize() # 각각 초기화 설정 즉 위치나 이런것들을 랜덤 배치.
 
     stn_list = instance.stn_list
     stn: Station
     for stn in stn_list:
-        stn.initialize()
+        stn.initialize()  # 주유소를 랜덤 배치
 
     def update_priority_req(target_list: List[Request]):
         for req in target_list:
@@ -31,7 +31,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
                 stn.priority = PENALTY
 #=====================================================================================
     while any(req.done is False for req in req_list):
-        update_priority_req(req_list) # 차량에 대한 우선순위배정
+        update_priority_req(req_list) # 차량에 대한 우선순위배정 (시작 가능 시간으로 우선순위를 배정=> 값이 작을 수록 우선순위가 높은것)
         # 이해하기---------------------------------
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
         not_completed_reqs.sort(key=lambda x: x.priority, reverse=False)
@@ -45,7 +45,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
         # 이해하기---------------------------------
 
         update_priority_stn(stn_list, not_completed_reqs[0]) # 주유소에 대한 우선순위배정
-        servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list))
+        servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list)) # prob에서 can_recharge가 False로 변경하는 코드가 없음 => 추가해야 하나,,?
         servable_stn.sort(key=lambda x: x.priority, reverse=False)
 
         try:

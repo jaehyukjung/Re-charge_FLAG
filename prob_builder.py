@@ -37,7 +37,7 @@ class Request:
 class Station:
     def __init__(self, ID: int):
         self.id = ID
-        self.loc = [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]  # Lat and Long
+        self.loc = [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]  # Lat and Long (위도와 경도)
         self.max_capacity = 100
         self.avail_time = 0
         self.rchg_speed = [10, 5, 7]  # Different Charging Speed
@@ -88,7 +88,7 @@ class MovableStation(Station):
         pass
 
     def doable(self, target: Request) -> bool:
-        pass
+        Station.doable(self, Request)
 
     def __repr__(self):
         return str('Movable Station # ' + str(self.id))
@@ -99,6 +99,23 @@ def get_distance_lat(coord1, coord2):
     R = 6372800  # Earth radius in meters
     lat1, lon1 = coord1
     lat2, lon2 = coord2
+
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+
+    a = math.sin(dphi / 2) ** 2 + \
+        math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+
+    return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))  # Returns in meters
+
+
+def get_between_distance_lat(coord1, coord2):
+    R = 6372800  # Earth radius in meters
+    lat1, lon1 = coord1
+    lat2, lon2 = coord2
+
+
 
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
     dphi = math.radians(lat2 - lat1)

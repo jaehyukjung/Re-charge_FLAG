@@ -1,3 +1,4 @@
+import random
 import prob_builder as prob
 import solver
 
