@@ -2,7 +2,7 @@ import copy
 import math
 import random
 global DIST_FUNC
-
+import prob_builder as prob
 
 class Prob_Instance: # 프린트 함수르 통해 출력할 때 어떻게 할 지를 설명한는 내용
     def __init__(self):
@@ -67,6 +67,8 @@ class Station:
         target.start_time = self.avail_time
         self.measures['total_tardiness'] += max(0, self.avail_time - target.time_wdw[1])
         self.avail_time += 0 # Add Recharging Time
+
+
         self.loc = target.loc
         self.served_req.append(target.id)
 
@@ -139,3 +141,4 @@ print(x, y)
 print(math.atan2(y,x))
 
 print(math.sin(math.atan2(y,x)))
+

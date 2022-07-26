@@ -8,7 +8,7 @@ def LoadProb():
     ThisProb.req_list.append(prob.Request(2))
     ThisProb.req_list.append(prob.Request(3))
     ThisProb.stn_list.append(prob.Station(1))
-    ThisProb.stn_list.append(prob.MovableStation(2, moveSpeed=35))
+    ThisProb.stn_list.append(prob.MovableStation(2, moveSpeed=40))
     ThisProb.stn_list.append(prob.Station(3))
     print(ThisProb)
     return ThisProb
