@@ -46,7 +46,7 @@ def rule_solver(instance: Prob_Instance) -> dict: # 반환값이 dict라는 걸 
 
         update_priority_stn(stn_list, not_completed_reqs[0]) # 주유소에 대한 우선순위배정
         servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list)) # prob에서 can_recharge가 False로 변경하는 코드가 없음 => 추가해야 하나,,?
-        servable_stn.sort(key=lambda x: x.priority, reverse=False)
+
 
         try:
             servable_stn[0].recharge(not_completed_reqs[0])
@@ -56,8 +56,11 @@ def rule_solver(instance: Prob_Instance) -> dict: # 반환값이 dict라는 걸 
 # =====================================================================================
     solution['Snapshop_Requests'] = req_list
     solution['Snapshop_Stations'] = stn_list
-    total_distance = 0
+    total_time = 0
+    maximum = 0
     for stn in stn_list:
-        total_distance += stn.measures['total_distance']
-    solution['Objective'] = total_distance
+        if stn.measures['total_time'] > maximum:
+            total_time = stn.measures['total_time']
+
+    solution['Objective'] = total_time
     return solution
