@@ -1,6 +1,4 @@
 import copy
-import math
-import random
 import requests
 import json
 
@@ -43,7 +41,7 @@ class Station:
         self.loc = Loc  #[random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]
         self.max_capacity = 80
         self.avail_time = 0
-        self.rchg_speed = [0, 50, 6]  # Different Charging Speed
+        self.rchg_speed = [100, 50, 6]  # Different Charging Speed
         self.rchg_cost = [0, 7.5, 0.8225]  # Different Charging Cost
         self.origin = []  # Original Station's Location
 
@@ -64,28 +62,28 @@ class Station:
         global DIST_FUNC
         req_distance = DIST_FUNC(target.loc, self.loc)
         self.measures['total_distance'] += req_distance
-        self.avail_time = req_distance / 60  # 이동속도 : 60 고정
+        self.avail_time = req_distance / 60  # 이동속도 : 60 고정  # 도착시간
         # =======================================================
         recharge_speed = max([x*y for x,y in zip(self.rchg_speed,target.rchg_type)]) # 주유 속도
 
         recharge_time = target.rchg_amount / recharge_speed  # 주유하는 시간
+
         self.avail_time = max(self.avail_time, self.measures['total_time'])
-        print(1)
         # target.start_time = self.avail_time
         # self.measures['total_tardiness'] += max(0, self.avail_time - target.time_wdw[1])
 
-        self.measures['total_time'] = self.avail_time + recharge_time
+        self.measures['total_time'] = self.avail_time + recharge_time  # 종료된 시간
         # ==========================================================
         self.avail_time += 0  # Add Recharging Time
         target.loc = self.loc  # 수정 : 일반 Station (car -> Station)
 
         # ==========추가 한 부분
         self.now_capacity -= target.rchg_amount
-        self.avail_time += self.rchg_speed[2]
+        # self.avail_time += self.rchg_speed[2]
         # ========================
         self.served_req.append(target.id)
 
-    def doable(self, target: Request) -> bool:  ## hinting 을 주는 방식
+    def doable(self, target: Request) -> bool:
         if target.done:
             return False
         elif target.rchg_amount > self.now_capacity:
