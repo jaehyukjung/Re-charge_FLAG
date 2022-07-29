@@ -31,7 +31,6 @@ def rule_solver(instance: Prob_Instance) -> dict:
             req.priority = dist
 
     def update_priority_stn(target_list: List[Station], target_req: Request):
-        req_lst = []
         for stn in target_list:
             if stn.doable(target_req):
                 stn.can_recharge = True

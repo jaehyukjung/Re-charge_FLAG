@@ -53,7 +53,6 @@ class Station:
         self.measures['total_tardiness'] = 0
         self.served_req = []
         self.can_recharge = True
-
         self.measures['total_time'] = 0 # 추가
 
     def recharge(self, target: Request):
@@ -63,24 +62,15 @@ class Station:
         req_distance = DIST_FUNC(target.loc, self.loc)
         self.measures['total_distance'] += req_distance
         self.avail_time = req_distance / 60  # 이동속도 : 60 고정  # 도착시간
-        # =======================================================
         recharge_speed = max([x*y for x,y in zip(self.rchg_speed,target.rchg_type)]) # 주유 속도
-
         recharge_time = target.rchg_amount / recharge_speed  # 주유하는 시간
-
         self.avail_time = max(self.avail_time, self.measures['total_time'])
-        # target.start_time = self.avail_time
+        target.start_time = self.avail_time
         # self.measures['total_tardiness'] += max(0, self.avail_time - target.time_wdw[1])
-
         self.measures['total_time'] = self.avail_time + recharge_time  # 종료된 시간
-        # ==========================================================
         self.avail_time += 0  # Add Recharging Time
         target.loc = self.loc  # 수정 : 일반 Station (car -> Station)
-
-        # ==========추가 한 부분
         self.now_capacity -= target.rchg_amount
-        # self.avail_time += self.rchg_speed[2]
-        # ========================
         self.served_req.append(target.id)
 
     def doable(self, target: Request) -> bool:
@@ -94,8 +84,6 @@ class Station:
     def __repr__(self):
         return str('Station # ' + str(self.id))
 
-
-# ----------------우리가 짜야하는 부분..--------------------------------
 class MovableStation(Station):
     def __init__(self, ID, Loc, moveSpeed=40):
         Station.__init__(self, ID, Loc)
@@ -112,22 +100,14 @@ class MovableStation(Station):
         req_distance = DIST_FUNC(self.loc, target.loc)  # 수정
         self.measures['total_distance'] += req_distance
         self.avail_time = req_distance / target.speed  # 도착시간
-        # =======================================================
         recharge_speed = max([x*y for x,y in zip(self.rchg_speed,target.rchg_type)]) # 주유 속도
         recharge_time = target.rchg_amount / recharge_speed  # 주유하는 시간
         # target.start_time = self.avail_time
         # self.measures['total_tardiness'] += max(0, self.avail_time - target.time_wdw[1])
         self.measures['total_time'] += (self.avail_time + recharge_time)
-        # ==========================================================
         self.avail_time += 0  # Add Recharging Time
         self.loc = target.loc
-
-
-        # ==========  주유 가능량 추가 한 부분
         self.now_capacity -= target.rchg_amount
-        # ==============================================
-
-
         self.served_req.append(target.id)
 
     def doable(self, target: Request) -> bool:
@@ -140,10 +120,6 @@ class MovableStation(Station):
 
     def __repr__(self):
         return str('Movable Station # ' + str(self.id))
-
-
-# ----------------우리가 짜야하는 부분..--------------------------------
-
 
 def get_distance_lat(coord1, coord2):
     lat1, lon1 = coord1
