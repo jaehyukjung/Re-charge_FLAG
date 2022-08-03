@@ -25,8 +25,8 @@ class Request:
         self.id = ID
         self.loc = Loc # [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]  # 입력 변수로 변경
         self.rchg_amount = Rchg_amount
-        self.rchg_type = [0, 1, 1]  # 초고속 고속 완속
-        self.time_wdw = [0, 10000000]  # time window -> x
+        self.rchg_type = [0, 1, 1]  # 초고속 고속 완속 - 현재는 초고속만 고려
+        self.time_wdw = [0, 10000000]  # time window -> 현재는 고려 X
         self.speed = 60
 
     def initialize(self):
@@ -44,6 +44,7 @@ class Station:
         self.rchg_speed = [100, 50, 6]  # Different Charging Speed
         self.rchg_cost = [0, 7.5, 0.8225]  # Different Charging Cost
         self.origin = []  # Original Station's Location
+
 
     def initialize(self):
         self.now_capacity = self.max_capacity
