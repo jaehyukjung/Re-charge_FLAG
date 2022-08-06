@@ -1,11 +1,14 @@
 import prob_builder
 from prob_builder import *
 from typing import List
+import time
 PENALTY = 1000000
 
 
 def rule_solver(instance: Prob_Instance) -> dict:
     print('Solver Start')
+    total_algorithm_start = time.time()
+
     solution = {}
     solution['Problem'] = instance.deepcopy()
 
@@ -19,14 +22,37 @@ def rule_solver(instance: Prob_Instance) -> dict:
     for stn in stn_list:
         stn.initialize()
 
+# ===================================================================================================
+    distance_start = time.time()
+
+    distance_dic = {}
+
+    for req in req_list:
+        for st in stn_list:
+            distance_dic[dic_key(req.loc, st.loc)] = get_distance_lat(req.loc, st.loc)
+            distance_dic[dic_key(st.loc, req.loc)] = get_distance_lat(st.loc, req.loc)
+
+    for req1 in req_list:
+        for req2 in req_list:
+            distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
+            distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
+
+    for req1 in stn_list:
+        for req2 in stn_list:
+            distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
+            distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
+
+    distance_end = time.time()
+    # ===================================================================================================
+    start = time.time()
     def update_priority_req(target_list: List[Request], station_list: List[Station]):
         for req in target_list:
             req_lst = []
             for st in station_list:
                 if isinstance(st, MovableStation):
-                    req_lst.append(prob_builder.get_distance_lat(st.loc,req.loc))
+                    req_lst.append(distance_dic[dic_key(st.loc, req.loc)]) # 위의 딕셔너리에서 값 바로 가져오기
                 else:
-                    req_lst.append(prob_builder.get_distance_lat(req.loc, st.loc))
+                    req_lst.append(distance_dic[dic_key(req.loc, st.loc)])
             dist = min(req_lst)
             req.priority = dist
 
@@ -35,9 +61,9 @@ def rule_solver(instance: Prob_Instance) -> dict:
             if stn.doable(target_req):
                 stn.can_recharge = True
                 if isinstance(stn, MovableStation):
-                    stn.priority = (prob_builder.get_distance_lat(stn.loc,target_req.loc))
+                    stn.priority = (distance_dic[dic_key(stn.loc, target_req.loc)])
                 else:
-                    stn.priority = (prob_builder.get_distance_lat(target_req.loc, stn.loc))
+                    stn.priority = (distance_dic[dic_key(target_req.loc, stn.loc)])
             else:
                 stn.can_recharge = False
                 stn.priority = PENALTY
@@ -65,4 +91,11 @@ def rule_solver(instance: Prob_Instance) -> dict:
             maximum = stn.measures['total_time']
 
     solution['Objective'] = maximum
+
+    total_algorithm_end = time.time()
+
+    print(f"total_time :{total_algorithm_end - total_algorithm_start:.4f} ")
+    print(f"distance_time : {distance_end - distance_start:.4f}")
+    print(f"algorithm_time : {(total_algorithm_end - total_algorithm_start) - (distance_end - distance_start):.4f}")
+
     return solution

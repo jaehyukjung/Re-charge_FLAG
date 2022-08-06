@@ -4,7 +4,6 @@ import json
 
 global DIST_FUNC
 
-
 class Prob_Instance:  # 프린트 함수르 통해 출력할 때 어떻게 할 지를 설명한는 내용
     def __init__(self):
         self.objective = 'Total_Time'
@@ -123,13 +122,19 @@ class MovableStation(Station):
         return str('Movable Station # ' + str(self.id))
 
 def get_distance_lat(coord1, coord2):
-    lat1, lon1 = coord1
-    lat2, lon2 = coord2
+    if coord2[0] == coord1[0] and coord2[1] == coord1[1]:
+        dist = 0
 
-    r = requests.get(
-        f"http://router.project-osrm.org/route/v1/car/{lon1},{lat1};{lon2},{lat2}?overview=full""")
-    routes = json.loads(r.content)
-    route_1 = routes.get("routes")[0]
-    dist = route_1["distance"]
+    else:
+        lat1, lon1 = coord1
+        lat2, lon2 = coord2
+        r = requests.get(
+            f"http://router.project-osrm.org/route/v1/car/{lon1},{lat1};{lon2},{lat2}?overview=full""")
+        routes = json.loads(r.content)
+        route_1 = routes.get("routes")[0]
+        dist = route_1["distance"]
 
     return dist/1000  # Returns in kilometers
+
+def dic_key(coord1, coord2):
+    return str(coord1[0]) + str(coord1[1]) + str(coord2[0]) + str(coord2[1])
