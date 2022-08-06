@@ -34,13 +34,15 @@ def rule_solver(instance: Prob_Instance) -> dict:
 
     for req1 in req_list:
         for req2 in req_list:
-            distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
-            distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
+            if req1.id != req2.id:
+                distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
+                distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
 
     for req1 in stn_list:
         for req2 in stn_list:
-            distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
-            distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
+            if req1.id != req2.id:
+                distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
+                distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
 
     distance_end = time.time()
     # ===================================================================================================
@@ -50,9 +52,16 @@ def rule_solver(instance: Prob_Instance) -> dict:
             req_lst = []
             for st in station_list:
                 if isinstance(st, MovableStation):
-                    req_lst.append(distance_dic[dic_key(st.loc, req.loc)]) # 위의 딕셔너리에서 값 바로 가져오기
+                    try:
+                        req_lst.append(distance_dic[dic_key(st.loc, req.loc)]) # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        req_lst.append(get_distance_lat(st.loc, req.loc)) # 위의 딕셔너리에서 값 바로 가져오기
                 else:
-                    req_lst.append(distance_dic[dic_key(req.loc, st.loc)])
+                    try:
+                        req_lst.append(distance_dic[dic_key(req.loc, st.loc)])  # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        req_lst.append(get_distance_lat(req.loc, st.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+
             dist = min(req_lst)
             req.priority = dist
 
@@ -61,16 +70,23 @@ def rule_solver(instance: Prob_Instance) -> dict:
             if stn.doable(target_req):
                 stn.can_recharge = True
                 if isinstance(stn, MovableStation):
-                    stn.priority = (distance_dic[dic_key(stn.loc, target_req.loc)])
+                    try:
+                        stn.priority = (distance_dic[dic_key(stn.loc, target_req.loc)])  # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        stn.priority = get_distance_lat(stn.loc, target_req.loc)
                 else:
-                    stn.priority = (distance_dic[dic_key(target_req.loc, stn.loc)])
+                    try:
+                        stn.priority = (distance_dic[dic_key(target_req.loc, stn.loc)])  # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        stn.priority = get_distance_lat(target_req.loc, stn.loc)
             else:
                 stn.can_recharge = False
                 stn.priority = PENALTY
 
     while any(req.done is False for req in req_list):
-        update_priority_req(req_list, stn_list)
+        # update_priority_req(req_list, stn_list) # 순서 수정 : 이경우 모든 경우에 대해서 우선순위를 메기기 때문에 필요 없다고 생각..!
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
+        update_priority_req(not_completed_reqs, stn_list) # 여기 등장.
         not_completed_reqs.sort(key=lambda x: x.priority, reverse=False)
 
         update_priority_stn(stn_list, not_completed_reqs[0])
