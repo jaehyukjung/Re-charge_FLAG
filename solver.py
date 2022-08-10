@@ -1,7 +1,11 @@
+import os.path
+
 import prob_builder
 from prob_builder import *
 from typing import List
 import time
+import pickle
+
 PENALTY = 1000000
 
 
@@ -22,40 +26,45 @@ def rule_solver(instance: Prob_Instance) -> dict:
     for stn in stn_list:
         stn.initialize()
 
-# ===================================================================================================
+    # ===================================================================================================
     distance_start = time.time()
+    if not os.path.exists('dist.p'):
+        distance_dic = {}
 
-    distance_dic = {}
+        for req in req_list:
+            for st in stn_list:
+                distance_dic[dic_key(req.loc, st.loc)] = get_distance_lat(req.loc, st.loc)
+                distance_dic[dic_key(st.loc, req.loc)] = get_distance_lat(st.loc, req.loc)
 
-    for req in req_list:
-        for st in stn_list:
-            distance_dic[dic_key(req.loc, st.loc)] = get_distance_lat(req.loc, st.loc)
-            distance_dic[dic_key(st.loc, req.loc)] = get_distance_lat(st.loc, req.loc)
+        for req1 in req_list:
+            for req2 in req_list:
+                if req1.id != req2.id:
+                    distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
+                    distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
 
-    for req1 in req_list:
-        for req2 in req_list:
-            if req1.id != req2.id:
-                distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
-                distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
-
-    for req1 in stn_list:
-        for req2 in stn_list:
-            if req1.id != req2.id:
-                distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
-                distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
-
+        # for req1 in stn_list:
+        #     for req2 in stn_list:
+        #         if req1.id != req2.id:
+        #             distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
+        #             distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
+        with open('dist.p', 'wb') as file:
+            pickle.dump(distance_dic, file)
+    else:
+        with open('dist.p', 'rb') as file:
+            distance_dic = pickle.load(file)
     distance_end = time.time()
     # ===================================================================================================
     start = time.time()
+
     def update_priority_req(target_list: List[Request], station_list: List[Station]):
         for req in target_list:
             req_lst = []
             for st in station_list:
                 if isinstance(st, MovableStation):
                     try:
-                        req_lst.append(distance_dic[dic_key(st.loc, req.loc)]) # 위의 딕셔너리에서 값 바로 가져오기
+                        req_lst.append(distance_dic[dic_key(st.loc, req.loc)])  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
-                        req_lst.append(get_distance_lat(st.loc, req.loc)) # 위의 딕셔너리에서 값 바로 가져오기
+                        req_lst.append(get_distance_lat(st.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
                 else:
                     try:
                         req_lst.append(distance_dic[dic_key(req.loc, st.loc)])  # 위의 딕셔너리에서 값 바로 가져오기
@@ -86,7 +95,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
     while any(req.done is False for req in req_list):
         # update_priority_req(req_list, stn_list) # 순서 수정 : 이경우 모든 경우에 대해서 우선순위를 메기기 때문에 필요 없다고 생각..!
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
-        update_priority_req(not_completed_reqs, stn_list) # 여기 등장.
+        update_priority_req(not_completed_reqs, stn_list)  # 여기 등장.
         not_completed_reqs.sort(key=lambda x: x.priority, reverse=False)
 
         update_priority_stn(stn_list, not_completed_reqs[0])
