@@ -58,7 +58,8 @@ class Station:
         self.measures['total_time'] = 0  # 추가
 
     def recharge(self, target: Request):
-        if not self.doable(target): raise Exception('Infeasible Recharging!')
+        if not self.doable(target):
+            raise Exception('Infeasible Recharging!')
         target.done = True
         global DIST_FUNC
         req_distance = DIST_FUNC(target.loc, self.loc)

@@ -59,20 +59,20 @@ def rule_solver(instance: Prob_Instance) -> dict:
     def update_priority_req(target_list: List[Request], station_list: List[Station]):
         for req in target_list:
             req_lst = []
-            for st in station_list:
-                if isinstance(st, MovableStation):
+            for stn in station_list:
+                if isinstance(stn, MovableStation):
                     try:
-                        req_lst.append(distance_dic[dic_key(st.loc, req.loc)])  # 위의 딕셔너리에서 값 바로 가져오기
+                        req_lst.append(distance_dic[dic_key(stn.loc, req.loc)])  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
-                        req_lst.append(get_distance_lat(st.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                        req_lst.append(get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
                 else:
                     try:
-                        req_lst.append(distance_dic[dic_key(req.loc, st.loc)])  # 위의 딕셔너리에서 값 바로 가져오기
+                        req_lst.append(distance_dic[dic_key(req.loc, stn.loc)])  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
-                        req_lst.append(get_distance_lat(req.loc, st.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                        req_lst.append(get_distance_lat(req.loc, stn.loc))  # 위의 딕셔너리에서 값 바로 가져오기
 
             dist = min(req_lst)
-            req.priority = dist
+            req.priority = dist / req.rchg_amount
 
     def update_priority_stn(target_list: List[Station], target_req: Request):
         for stn in target_list:
@@ -92,17 +92,52 @@ def rule_solver(instance: Prob_Instance) -> dict:
                 stn.can_recharge = False
                 stn.priority = PENALTY
 
+
+    def priority(target_list: List[Request], station_list: List[Station]):
+        minimum = 10000
+        dist = 0
+        pri_ans = []
+        for req in target_list:
+            for stn in station_list:
+                if stn.doable(req):
+                    stn.can_recharge = True
+                    if isinstance(stn, MovableStation):
+                        try:
+                            dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                        except Exception:
+                            dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                    else:
+                        try:
+                            dist = distance_dic[dic_key(req.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
+                        except Exception:
+                            dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
+                else:
+                    stn.can_recharge = False
+                    stn.priority = PENALTY
+
+                if dist < minimum:
+                    minimum = dist
+                    pri_ans.clear()
+                    pri_ans.append(req)
+                    pri_ans.append(stn)
+
+        return pri_ans[0], pri_ans[1]
+
     while any(req.done is False for req in req_list):
         # update_priority_req(req_list, stn_list) # 순서 수정 : 이경우 모든 경우에 대해서 우선순위를 메기기 때문에 필요 없다고 생각..!
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
-        update_priority_req(not_completed_reqs, stn_list)  # 여기 등장.
-        not_completed_reqs.sort(key=lambda x: x.priority, reverse=False)
-
-        update_priority_stn(stn_list, not_completed_reqs[0])
+        # update_priority_req(not_completed_reqs, stn_list)  # 여기 등장.
+        # not_completed_reqs.sort(key=lambda x: x.priority, reverse=False)
+# ========================수정해야함.
+#         update_priority_stn(stn_list, not_completed_reqs[0])
         servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list))
-        servable_stn.sort(key=lambda x: x.priority, reverse=False)
+        # servable_stn.sort(key=lambda x: x.priority, reverse=False)
+
+        pri_req, pri_stn = priority(not_completed_reqs,servable_stn)
+
         try:
-            servable_stn[0].recharge(not_completed_reqs[0])
+             # servable_stn[0].recharge(not_completed_reqs[0])
+             pri_stn.recharge(pri_req)
         except Exception:
             raise Exception('Invalid Logic')
             break

@@ -13,9 +13,26 @@ def LoadProb():
     print(ThisProb)
     return ThisProb
 
+def random_LoadProb():
+    random_req = random.randint(8,10)
+    random_stn = random.randint(2,5)
+    random_Mstn = random.randint(2,5)
+
+    ThisProb = prob.Prob_Instance()
+    for i in range(random_req):
+        ThisProb.req_list.append(prob.Request(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 50)))
+
+    for i in range(random_stn):
+        ThisProb.stn_list.append(prob.Station(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]))
+
+    for i in range(random_Mstn):
+        ThisProb.stn_list.append(prob.MovableStation(i+random_stn, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], moveSpeed=60))
+
+    print(ThisProb)
+    return ThisProb
 
 if __name__ == '__main__':
-    random.seed(42)
-    Sample = LoadProb()
+    random.seed(777)
+    Sample = random_LoadProb()
     Solution = solver.rule_solver(Sample)
     print('Solved and objective value is ' + str(Solution['Objective']))
