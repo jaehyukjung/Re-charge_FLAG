@@ -92,7 +92,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
                 stn.can_recharge = False
                 stn.priority = PENALTY
 
-
+# ====================================================================================================================
     def priority(target_list: List[Request], station_list: List[Station]):
         minimum = 10000
         dist = 0
@@ -122,15 +122,16 @@ def rule_solver(instance: Prob_Instance) -> dict:
                     pri_ans.append(stn)
 
         return pri_ans[0], pri_ans[1]
+# ====================================================================================================================
 
     while any(req.done is False for req in req_list):
-        # update_priority_req(req_list, stn_list) # 순서 수정 : 이경우 모든 경우에 대해서 우선순위를 메기기 때문에 필요 없다고 생각..!
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
         # update_priority_req(not_completed_reqs, stn_list)  # 여기 등장.
         # not_completed_reqs.sort(key=lambda x: x.priority, reverse=False)
-# ========================수정해야함.
-#         update_priority_stn(stn_list, not_completed_reqs[0])
+
+
         servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list))
+        # update_priority_stn(servable_stn, not_completed_reqs[0])
         # servable_stn.sort(key=lambda x: x.priority, reverse=False)
 
         pri_req, pri_stn = priority(not_completed_reqs,servable_stn)
