@@ -94,9 +94,8 @@ def rule_solver(instance: Prob_Instance) -> dict:
 
 # ====================================================================================================================
     def priority(target_list: List[Request], station_list: List[Station]):
-        minimum = 10000
         dist = 0
-        pri_ans = []
+        pri_dic = {}
         for req in target_list:
             for stn in station_list:
                 if stn.doable(req):
@@ -115,13 +114,11 @@ def rule_solver(instance: Prob_Instance) -> dict:
                     stn.can_recharge = False
                     stn.priority = PENALTY
 
-                if dist < minimum:
-                    minimum = dist
-                    pri_ans.clear()
-                    pri_ans.append(req)
-                    pri_ans.append(stn)
+                pri_dic[dist] = [req, stn]
 
-        return pri_ans[0], pri_ans[1]
+        minimum = min(pri_dic.keys())
+
+        return pri_dic[minimum][0], pri_dic[minimum][1]
 # ====================================================================================================================
 
     while any(req.done is False for req in req_list):
