@@ -26,7 +26,7 @@ def random_LoadProb():
         ThisProb.stn_list.append(prob.Station(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]))
 
     for i in range(random_Mstn):
-        ThisProb.stn_list.append(prob.MovableStation(i+random_stn, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], moveSpeed=60))
+        ThisProb.stn_list.append(prob.MovableStation(i+random_stn+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], moveSpeed=60))
 
     print(ThisProb)
     return ThisProb

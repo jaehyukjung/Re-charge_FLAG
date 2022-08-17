@@ -1,17 +1,13 @@
 import copy
 import requests
 import json
+import pickle
 
-global DIST_FUNC
-
-
-class Prob_Instance:  # 프린트 함수르 통해 출력할 때 어떻게 할 지를 설명한는 내용
+class Prob_Instance:
     def __init__(self):
         self.objective = 'Total_Time'
         self.req_list = []
         self.stn_list = []
-        global DIST_FUNC
-        DIST_FUNC = get_distance_lat
 
     def __repr__(self):
         return str(
@@ -25,22 +21,22 @@ class Prob_Instance:  # 프린트 함수르 통해 출력할 때 어떻게 할 �
 class Request:
     def __init__(self, ID: int, Loc, Rchg_amount):
         self.id = ID
-        self.loc = Loc  # [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]  # 입력 변수로 변경
+        self.loc = Loc
         self.rchg_amount = Rchg_amount
-        self.rchg_type = [0, 1, 1]  # 초고속 고속 완속 - 현재는 초고속만 고려
-        self.time_wdw = [0, 10000000]  # time window -> 현재는 고려 X
+        self.rchg_type = [0, 1, 1]
+        self.time_wdw = [0, 10000000]
         self.speed = 60
 
     def initialize(self):
         self.done = False
         self.priority = -1
-        self.start_time = -1  # 충전 시작 시간
+        self.start_time = -1
 
 
 class Station:
     def __init__(self, ID: int, Loc):
         self.id = ID
-        self.loc = Loc  # [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]
+        self.loc = Loc
         self.max_capacity = 80
         self.avail_time = 0
         self.rchg_speed = [100, 50, 6]  # Different Charging Speed
@@ -52,27 +48,25 @@ class Station:
         self.priority = -1
         self.measures = {}
         self.measures['total_distance'] = 0
-        self.measures['total_tardiness'] = 0
         self.served_req = []
         self.can_recharge = True
         self.measures['total_time'] = 0  # 추가
 
     def recharge(self, target: Request):
+        with open('dist.p', 'rb') as file:
+            distance_dic = pickle.load(file)
+
         if not self.doable(target):
             raise Exception('Infeasible Recharging!')
         target.done = True
-        global DIST_FUNC
-        req_distance = DIST_FUNC(target.loc, self.loc)
+        req_distance = distance_dic[dic_key(target.loc, self.loc)]
         self.measures['total_distance'] += req_distance
-        self.avail_time = req_distance / 60  # 이동속도 : 60 고정  # 도착시간
-        recharge_speed = max([x * y for x, y in zip(self.rchg_speed, target.rchg_type)])  # 주유 속도
+        self.avail_time = req_distance / 60  # 도착 시간
+        recharge_speed = max([x * y for x, y in zip(self.rchg_speed, target.rchg_type)])
         recharge_time = target.rchg_amount / recharge_speed  # 주유하는 시간
-        self.avail_time = max(self.avail_time, self.measures['total_time'])
-        target.start_time = self.avail_time
-        # self.measures['total_tardiness'] += max(0, self.avail_time - target.time_wdw[1])
-        self.measures['total_time'] = self.avail_time + recharge_time  # 종료된 시간
-        self.avail_time += 0  # Add Recharging Time
-        target.loc = self.loc  # 수정 : 일반 Station (car -> Station)
+        self.avail_time = max(self.avail_time, self.measures['total_time']) # 일반 station의 경우 주유 시작 가능시간이 이전 req의 주유가 끝난 시점과 자신의 이동시간 중 오래 걸리는 것으로 설정.
+        self.measures['total_time'] = self.avail_time + recharge_time
+        target.loc = self.loc
         self.now_capacity -= target.rchg_amount
         self.served_req.append(target.id)
 
@@ -91,27 +85,28 @@ class Station:
 class MovableStation(Station):
     def __init__(self, ID, Loc, moveSpeed=40):
         Station.__init__(self, ID, Loc)
-        self.move_speed = moveSpeed  # in km/h (Set Default Value)
+        self.move_speed = moveSpeed
 
     def initialize(self):
         Station.initialize(self)
 
     def recharge(self, target: Request):
+        with open('dist.p', 'rb') as file:
+            distance_dic = pickle.load(file)
+
         if not self.doable(target): raise Exception('Infeasible Recharging!')
         target.done = True
         global DIST_FUNC
-        req_distance = DIST_FUNC(self.loc, target.loc)  # 수정
+        req_distance = distance_dic[dic_key(self.loc, target.loc)]
         self.measures['total_distance'] += req_distance
-        self.avail_time = req_distance / target.speed  # 도착시간
+        self.avail_time = req_distance / target.speed # 도착시간
         recharge_speed = max([x * y for x, y in zip(self.rchg_speed, target.rchg_type)])  # 주유 속도
-        recharge_time = target.rchg_amount / recharge_speed  # 주유하는 시간
-        # target.start_time = self.avail_time
-        # self.measures['total_tardiness'] += max(0, self.avail_time - target.time_wdw[1])
-        self.measures['total_time'] += (self.avail_time + recharge_time)
-        self.avail_time += 0  # Add Recharging Time
+        recharge_time = target.rchg_amount / recharge_speed  # 주유 시간
+        self.measures['total_time'] += (self.avail_time + recharge_time)  # Movable의 경우 끝난 시간 + 다음 req의 이동시간 +주유시간
         self.loc = target.loc
         self.now_capacity -= target.rchg_amount
         self.served_req.append(target.id)
+
 
     def doable(self, target: Request) -> bool:
         if target.done:
@@ -123,12 +118,6 @@ class MovableStation(Station):
 
     def __repr__(self):
         return str('Movable Station # ' + str(self.id))
-
-
-class Dist_matrix:
-    def __init__(self, keys, values):
-        for (key, value) in zip(keys, values):
-            self.__dict__[key] = value
 
 
 def get_distance_lat(coord1, coord2):
