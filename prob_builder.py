@@ -37,7 +37,7 @@ class Station:
     def __init__(self, ID: int, Loc):
         self.id = ID
         self.loc = Loc
-        self.max_capacity = 80
+        self.max_capacity = 1000
         self.avail_time = 0
         self.rchg_speed = [100, 50, 6]  # Different Charging Speed
         self.rchg_cost = [0, 7.5, 0.8225]  # Different Charging Cost
