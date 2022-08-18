@@ -27,12 +27,25 @@ def random_LoadProb():
 
     for i in range(random_Mstn):
         ThisProb.stn_list.append(prob.MovableStation(i+random_stn+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], moveSpeed=60))
-
+    print(ThisProb.stn_list[0].loc[0])
     print(ThisProb)
     return ThisProb
 
 if __name__ == '__main__':
     random.seed(777)
-    Sample = random_LoadProb()
+
+
+    random_lst = []
+    for i in range(30):
+        Sample = LoadProb()
+        Solution = solver.random_rule_solver(Sample)
+        print(str(i+1) + ' Solved and objective value is ' + str(Solution['Objective']))
+        random_lst.append(Solution['Objective'])
+
+    print('Solved and objective Mean value is ' + str(sum(random_lst)/len(random_lst)))
+
+    print('==================================================================== \n\n')
+    Sample = LoadProb()
     Solution = solver.rule_solver(Sample)
-    print('Solved and objective value is ' + str(Solution['Objective']))
+    print('jaehyuk : Solved and objective value is ' + str(Solution['Objective']))
+
