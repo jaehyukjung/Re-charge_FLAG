@@ -137,6 +137,6 @@ def get_distance_lat(coord1, coord2):
 
 
 def dic_key(coord1, coord2):
-    return str(coord1[0]) + str(coord1[1]) + str(coord2[0]) + str(coord2[1])
+    return str(coord1[0]) + str(coord1[1]) + 'to' + str(coord2[0]) + str(coord2[1])
 
 

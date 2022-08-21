@@ -1,10 +1,10 @@
 import os.path
+import time
+import random
+import re
 from prob_builder import *
 from typing import List
-import time
 import pickle
-import random
-
 PENALTY = 1000000
 
 def random_rule_solver(instance: Prob_Instance) -> dict:
@@ -68,19 +68,29 @@ def random_rule_solver(instance: Prob_Instance) -> dict:
 
     def priority(target_list: List[Request], station_list: List[Station]):
         pri_dic = {}
+        mstn_list = list(filter(lambda x: isinstance(x, MovableStation), station_list))
+        stn_list = list(filter(lambda x: isinstance(x, MovableStation) is False, station_list))
+
         for req in target_list:
-            for stn in station_list:
+            for stn in mstn_list:
                 if stn.doable(req):
-                    if isinstance(stn, MovableStation):
-                        try:
-                            dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
-                        except Exception:
-                            dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
-                    else:
-                        try:
-                            dist = distance_dic[dic_key(req.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
-                        except Exception:
-                            dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
+                    try:
+                        dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                else:
+                    dist = PENALTY
+
+                dist /= req.rchg_amount
+                pri_dic[dist] = [req, stn]
+
+        for req in target_list:
+            for stn in stn_list:
+                if stn.doable(req):
+                    try:
+                        dist = distance_dic[dic_key(req.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
                 else:
                     dist = PENALTY
 
@@ -104,7 +114,7 @@ def random_rule_solver(instance: Prob_Instance) -> dict:
     while any(req.done is False for req in req_list):
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
         servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list))
-        #pri_req, pri_stn = priority(not_completed_reqs,servable_stn) # 재혁
+        # pri_req, pri_stn = priority(not_completed_reqs,servable_stn) # 재혁
         pri_req, pri_stn = random_priority(not_completed_reqs,servable_stn) # 랜덤
         try:
              pri_stn.recharge(pri_req)
@@ -191,6 +201,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
 
     def priority(target_list: List[Request], station_list: List[Station]):
         pri_dic = {}
+        mpri_dic = {}
         for req in target_list:
             for stn in station_list:
                 if stn.doable(req):
@@ -199,20 +210,26 @@ def rule_solver(instance: Prob_Instance) -> dict:
                             dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                         except Exception:
                             dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+
+                        mpri_dic[dist] = [req, stn]
                     else:
                         try:
                             dist = distance_dic[dic_key(req.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
                         except Exception:
                             dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
+
+                        pri_dic[dist] = [req, stn]
                 else:
                     dist = PENALTY
 
-                dist /= req.rchg_amount
-                pri_dic[dist] = [req, stn]
+        if min(pri_dic.keys()) <= min(mpri_dic.keys()) and pri_dic[min(pri_dic.keys())][1].measures['total_time'] <= mpri_dic[min(mpri_dic.keys())][1].measures['total_time']:
+            minimum = min(pri_dic.keys())
+            return pri_dic[minimum][0], pri_dic[minimum][1]
 
-        minimum = min(pri_dic.keys())
+        else:
+            minimum = min(mpri_dic.keys())
+            return mpri_dic[minimum][0], mpri_dic[minimum][1]
 
-        return pri_dic[minimum][0], pri_dic[minimum][1]
 
     def random_priority(target_list: List[Request], station_list: List[Station]):
         for req in target_list:
