@@ -8,8 +8,15 @@ def LoadProb():
     ThisProb.req_list.append(prob.Request(1, [40.75458, -73.9936], 22.599))
     ThisProb.req_list.append(prob.Request(2, [40.80282, -73.9389], 67.3405))
     ThisProb.req_list.append(prob.Request(3, [40.84842, -73.9318], 2.207))
+    ThisProb.req_list.append(prob.Request(4, [40.81842, -73.9468], 2.207))
+    ThisProb.req_list.append(prob.Request(5, [40.82842, -73.9358], 2.207))
+    ThisProb.req_list.append(prob.Request(6, [40.83842, -73.9848], 2.207))
+    ThisProb.req_list.append(prob.Request(7, [40.74842, -73.9938], 2.207))
+    ThisProb.req_list.append(prob.Request(8, [40.89842, -73.9628], 2.207))
+
 
     ThisProb.stn_list.append(prob.Station(1, [40.7956, -73.9738]))
+    ThisProb.stn_list.append(prob.Station(3, [40.8486, -73.9328]))
     ThisProb.stn_list.append(prob.MovableStation(2, [40.74629, -73.9966], moveSpeed=60))
     print(ThisProb)
     return ThisProb
@@ -33,17 +40,17 @@ def random_LoadProb():
     return ThisProb
 
 if __name__ == '__main__':
-    random.seed(777)
+    random.seed(7)
 
 
     random_lst = []
-    for i in range(30):
-        Sample = LoadProb()
-        Solution = solver.random_rule_solver(Sample)
-        print(str(i+1) + ' Solved and objective value is ' + str(Solution['Objective']))
-        random_lst.append(Solution['Objective'])
+    # for i in range(30):
+    Sample = LoadProb()
+    Solution = solver.random_rule_solver(Sample)
+    print(' Solved and objective value is ' + str(Solution['Objective']))
+    # random_lst.append(Solution['Objective'])
 
-    print('Solved and objective Mean value is ' + str(sum(random_lst)/len(random_lst)))
+    # print('Solved and objective Mean value is ' + str(sum(random_lst)/len(random_lst)))
 
     print('==================================================================== \n\n')
     Sample = LoadProb()

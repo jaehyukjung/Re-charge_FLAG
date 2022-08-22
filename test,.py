@@ -222,11 +222,14 @@ def rule_solver(instance: Prob_Instance) -> dict:
                 else:
                     dist = PENALTY
 
-                pri_dic[dist] = [req, stn]
+        if min(pri_dic.keys()) <= min(mpri_dic.keys()) and pri_dic[min(pri_dic.keys())][1].measures['total_time'] <= mpri_dic[min(mpri_dic.keys())][1].measures['total_time']:
+            minimum = min(pri_dic.keys())
+            return pri_dic[minimum][0], pri_dic[minimum][1]
 
-        minimum = min(pri_dic.keys())
+        else:
+            minimum = min(mpri_dic.keys())
+            return mpri_dic[minimum][0], mpri_dic[minimum][1]
 
-        return pri_dic[minimum][0], pri_dic[minimum][1]
 
     def random_priority(target_list: List[Request], station_list: List[Station]):
         for req in target_list:
