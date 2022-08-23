@@ -114,8 +114,8 @@ def random_rule_solver(instance: Prob_Instance) -> dict:
     while any(req.done is False for req in req_list):
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
         servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list))
-        # pri_req, pri_stn = priority(not_completed_reqs,servable_stn) # 재혁
-        pri_req, pri_stn = random_priority(not_completed_reqs,servable_stn) # 랜덤
+        pri_req, pri_stn = priority(not_completed_reqs,servable_stn) # 재혁
+        # pri_req, pri_stn = random_priority(not_completed_reqs,servable_stn) # 랜덤
         try:
              pri_stn.recharge(pri_req)
         except Exception:
