@@ -222,13 +222,13 @@ def rule_solver(instance: Prob_Instance) -> dict:
                 else:
                     dist = PENALTY
 
-        if min(pri_dic.keys()) <= min(mpri_dic.keys()) and pri_dic[min(pri_dic.keys())][1].measures['total_time'] <= mpri_dic[min(mpri_dic.keys())][1].measures['total_time']:
-            minimum = min(pri_dic.keys())
-            return pri_dic[minimum][0], pri_dic[minimum][1]
-
-        else:
+        if min(pri_dic.keys()) >= min(mpri_dic.keys()) and pri_dic[min(pri_dic.keys())][1].measures['total_time'] >= mpri_dic[min(mpri_dic.keys())][1].measures['total_time']:
             minimum = min(mpri_dic.keys())
             return mpri_dic[minimum][0], mpri_dic[minimum][1]
+
+        else:
+            minimum = min(pri_dic.keys())
+            return pri_dic[minimum][0], pri_dic[minimum][1]
 
 
     def random_priority(target_list: List[Request], station_list: List[Station]):
@@ -269,4 +269,24 @@ def rule_solver(instance: Prob_Instance) -> dict:
     # print(f"algorithm_time : {(total_algorithm_end - total_algorithm_start) - (distance_end - distance_start):.4f}")
 
     return solution
+
+
+def random_LoadProb():
+    random_req = random.randint(8,10)
+    random_stn = random.randint(2,5)
+    random_Mstn = random.randint(2,5)
+
+    ThisProb = prob.Prob_Instance()
+    for i in range(random_req):
+        ThisProb.req_list.append(prob.Request(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 50)))
+
+    for i in range(random_stn):
+        ThisProb.stn_list.append(prob.Station(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]))
+
+    for i in range(random_Mstn):
+        ThisProb.stn_list.append(prob.MovableStation(i+random_stn+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], moveSpeed=60))
+    print(ThisProb.stn_list[0].loc[0])
+    print(ThisProb)
+    return ThisProb
+
 

@@ -12,7 +12,7 @@ class Prob_Instance:
     def __repr__(self):
         return str(
             'Objective - ' + self.objective + ', Station - ' + str(self.stn_list.__len__()) + ', Request - ' + str(
-                self.req_list.__len__()))
+                self.req_list.__len__()) + '\n')
 
     def deepcopy(self):
         return copy.deepcopy(self)
