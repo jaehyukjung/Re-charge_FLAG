@@ -70,27 +70,16 @@ def rule_solver(instance: Prob_Instance) -> dict:
                         except Exception:
                             dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
 
-                        recharge_speed = max([x * y for x, y in zip(stn.rchg_speed, req.rchg_type)])
-                        recharge_time = req.rchg_amount / recharge_speed  # 주유하는 시간
-                        if dist/60 > recharge_speed:
-                            mpri_dic[dist/60] = [req, stn]
-                        else:
-                            mpri_dic[recharge_time] = [req, stn]
-
+                        mpri_dic[dist] = [req, stn]
                     else:
                         try:
                             dist = distance_dic[dic_key(req.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
                         except Exception:
                             dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
-                        recharge_speed = max([x * y for x, y in zip(stn.rchg_speed, req.rchg_type)])
-                        recharge_time = req.rchg_amount / recharge_speed  # 주유하는 시간
-                        if dist / 60 > recharge_speed:
-                            pri_dic[dist / 60] = [req, stn]
-                        else:
-                            pri_dic[recharge_time] = [req, stn]
+
+                        pri_dic[dist] = [req, stn]
                 else:
                     dist = PENALTY
-
 
         if min(pri_dic.keys()) >= min(mpri_dic.keys()) and pri_dic[min(pri_dic.keys())][1].measures['total_time'] >= mpri_dic[min(mpri_dic.keys())][1].measures['total_time']:
             minimum = min(mpri_dic.keys())

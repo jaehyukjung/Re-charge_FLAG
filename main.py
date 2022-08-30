@@ -43,6 +43,7 @@ def Print_LoadProb(n):
     print(random_LoadProb(n))
 
 if __name__ == '__main__':
+
     random.seed(42)
     i = 0
     jae_list, su_list, min_list, random_list = [], [], [], []
