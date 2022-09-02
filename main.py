@@ -44,10 +44,10 @@ def Print_LoadProb(n):
 
 if __name__ == '__main__':
 
-    random.seed(7)
+    random.seed(42)
     i = 0
     jae_list, su_list, min_list, random_list = [], [], [], []
-
+    su_lst2 =[]
     while(i < 10):
         n = random.randint(1,1000)
         random.seed(n)
@@ -66,9 +66,12 @@ if __name__ == '__main__':
         Jae_Solution = j_solver.rule_solver(Sample)
         jae_list.append(round(Jae_Solution['Objective'], 4))
 
+
         Sample = random_LoadProb(n)
         Su_Solution = s_solver.subin_rule_solver(Sample)
-        su_list.append(round(Su_Solution['Objective'], 4))
+        su_list.append(Su_Solution)
+
+
 
         Sample =random_LoadProb(n)
         Min_Solution = m_solver.minseok_rule_solver(Sample)
@@ -77,8 +80,15 @@ if __name__ == '__main__':
 
         i += 1
 
-    df = pd.DataFrame({"random": random_list,
-                       "재혁": jae_list,
-                       "수빈": su_list,
-                        "민석": min_list})
+
+
+    df = pd.DataFrame(su_list)
+    df = df.transpose()
+    solution_dic = {'random': random_list, 'jaehyuk': jae_list, 'minseok': min_list}
+
+    for i in range(len(su_list)):
+        solution_dic['subin'+str((i+1)*10)] = su_list[i]
+
+
+    df = pd.DataFrame(solution_dic)
     df.to_csv("output_pd.csv", encoding='cp949')
