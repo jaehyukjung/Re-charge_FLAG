@@ -92,39 +92,36 @@ def subin_rule_solver(instance: Prob_Instance) -> dict:
 
         return pri_dic[minimum][0], pri_dic[minimum][1]
 
-    def su_priority(target_list: List[Request], station,i):
+    def su_priority(target_list: List[Request], station):
         su_list = []
         for req in target_list:
             dist = distance_dic[dic_key(req.loc, station.loc)]
-            if dist/60 <= 0.5:
+            if dist <= 50:
                 su_list.append(req)
         return su_list
 
-# =========================================================================s===========================================
-    not_move_station = list(filter(lambda x: isinstance(stn, MovableStation) is False, stn_list))
-    move_station = list(filter(lambda x: isinstance(stn, MovableStation) is True, stn_list))
+# ====================================================================================================================
+    not_move_station = list(filter(lambda x: isinstance(x, MovableStation) is False, stn_list))
+    move_station = list(filter(lambda x: isinstance(x, MovableStation) is True, stn_list))
 
     while any(req.done is False for req in req_list):
-        i =0.3
-        while (i<0.8):
+        for pri_stn in not_move_station:
             not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
-
-            for pri_stn in not_move_station:
-                reqest_list = su_priority(not_completed_reqs,pri_stn,i)
-                for pri_req in reqest_list:
-                    try:
-                         pri_stn.recharge(pri_req)
-                    except Exception:
-                        raise Exception('Invalid Logic')
-                        break
-            i += 0.1
-    not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
-    pri_req, pri_stn = priority(not_completed_reqs, move_station)
-    try:
-        pri_stn.recharge(pri_req)
-    except Exception:
-        raise Exception('Invalid Logic')
-
+            reqest_list = su_priority(not_completed_reqs,pri_stn)
+            for pri_req in reqest_list:
+                try:
+                     pri_stn.recharge(pri_req)
+                except Exception:
+                    raise Exception('Invalid Logic')
+                    break
+        not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
+        if len(not_completed_reqs) > 0:
+            pri_req, pri_stn = priority(not_completed_reqs, move_station)
+            try:
+                pri_stn.recharge(pri_req)
+            except Exception:
+                raise Exception('Invalid Logic')
+                break
 
     solution['Snapshop_Requests'] = req_list
     solution['Snapshop_Stations'] = stn_list

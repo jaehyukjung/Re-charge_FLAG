@@ -69,14 +69,14 @@ def rule_solver(instance: Prob_Instance) -> dict:
                             dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                         except Exception:
                             dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
-
+                        dist /= req.rchg_amount
                         mpri_dic[dist] = [req, stn]
                     else:
                         try:
                             dist = distance_dic[dic_key(req.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
                         except Exception:
                             dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
-
+                        dist /= req.rchg_amount
                         pri_dic[dist] = [req, stn]
                 else:
                     dist = PENALTY
