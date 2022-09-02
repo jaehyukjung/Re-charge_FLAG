@@ -23,9 +23,9 @@ def LoadProb():
     return ThisProb
 def random_LoadProb(n):
     random.seed(n)
-    random_req = random.randint(3,5)
-    random_stn = random.randint(1,3)
-    random_Mstn = random.randint(1,3)
+    random_req = random.randint(5,8)
+    random_stn = random.randint(1,2)
+    random_Mstn = random.randint(1,2)
 
     ThisProb = prob.Prob_Instance()
     for i in range(random_req):
@@ -44,7 +44,7 @@ def Print_LoadProb(n):
 
 if __name__ == '__main__':
 
-    random.seed(42)
+    random.seed(7)
     i = 0
     jae_list, su_list, min_list, random_list = [], [], [], []
 
