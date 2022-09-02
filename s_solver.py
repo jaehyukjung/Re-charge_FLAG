@@ -96,7 +96,7 @@ def subin_rule_solver(instance: Prob_Instance) -> dict:
         su_list = []
         for req in target_list:
             dist = distance_dic[dic_key(req.loc, station.loc)]
-            if dist <= 50:
+            if dist <= 100:
                 su_list.append(req)
         return su_list
 
