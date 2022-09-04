@@ -78,10 +78,11 @@ def rule_solver(instance: Prob_Instance) -> dict:
                             dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
                         dist /= req.rchg_amount
                         pri_dic[dist] = [req, stn]
-                else:
-                    dist = PENALTY
 
-        if min(pri_dic.keys()) >= min(mpri_dic.keys()) and pri_dic[min(pri_dic.keys())][1].measures['total_time'] >= mpri_dic[min(mpri_dic.keys())][1].measures['total_time']:
+
+        pri_time = sorted(pri_dic.keys(), key=lambda x:pri_dic[x][1].measures['total_time'], reverse=True)
+
+        if min(pri_dic.keys()) >= min(mpri_dic.keys()) and pri_dic[pri_time[0]][1].measures['total_time'] >= mpri_dic[min(mpri_dic.keys())][1].measures['total_time']:
             minimum = min(mpri_dic.keys())
             return mpri_dic[minimum][0], mpri_dic[minimum][1]
 
