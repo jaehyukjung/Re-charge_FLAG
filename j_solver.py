@@ -61,6 +61,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
     def priority(target_list: List[Request], station_list: List[Station]):
         pri_dic = {}
         mpri_dic = {}
+
         for req in target_list:
             for stn in station_list:
                 if stn.doable(req):
@@ -82,7 +83,8 @@ def rule_solver(instance: Prob_Instance) -> dict:
 
         pri_time = sorted(pri_dic.keys(), key=lambda x:pri_dic[x][1].measures['total_time'], reverse=True)
 
-        if min(pri_dic.keys()) >= min(mpri_dic.keys()) and pri_dic[pri_time[0]][1].measures['total_time'] >= mpri_dic[min(mpri_dic.keys())][1].measures['total_time']:
+        if min(pri_dic.keys()) >= min(mpri_dic.keys()) and\
+                max(pri_dic[pri_time[0]][1].measures['total_time'],min(pri_dic.keys())/60) >= (mpri_dic[min(mpri_dic.keys())][1].measures['total_time'] + min(mpri_dic.keys())/60):
             minimum = min(mpri_dic.keys())
             return mpri_dic[minimum][0], mpri_dic[minimum][1]
 
