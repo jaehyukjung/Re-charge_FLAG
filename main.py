@@ -1,6 +1,6 @@
 import random
 import prob_builder as prob
-import solver, j_solver, s_solver, m_solver
+import solver, j_solver, s_solver, m_solver, j_test
 import pandas as pd
 
 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     random.seed(42)
     i = 0
     jae_list, su_list, min_list, random_list = [], [], [], []
-    su_lst2 =[]
+    test_list =[]
     while(i < 10):
         n = random.randint(1,1000)
         random.seed(n)
@@ -65,6 +65,10 @@ if __name__ == '__main__':
         Sample = random_LoadProb(n)
         Jae_Solution = j_solver.rule_solver(Sample)
         jae_list.append(round(Jae_Solution['Objective'], 4))
+
+        Sample = random_LoadProb(n)
+        test_Solution = j_test.rule_solver(Sample)
+        test_list.append(round(test_Solution['Objective'], 4))
 
 
         Sample = random_LoadProb(n)
@@ -84,7 +88,7 @@ if __name__ == '__main__':
 
     df = pd.DataFrame(su_list)
     df = df.transpose()
-    solution_dic = {'random': random_list, 'jaehyuk': jae_list, 'minseok': min_list}
+    solution_dic = {'random': random_list, 'jaehyuk': jae_list, 'test': test_list,'minseok': min_list}
 
     for i in range(len(su_list)):
         solution_dic['subin'+str((i+1)*10)] = su_list[i]

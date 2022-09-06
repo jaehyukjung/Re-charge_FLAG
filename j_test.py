@@ -2,6 +2,7 @@ import os.path
 from prob_builder import *
 from typing import List
 import pickle
+import s_solver
 PENALTY = 1000000
 
 
@@ -61,6 +62,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
     def priority(target_list: List[Request], station_list: List[Station]):
         pri_dic = {}
         mpri_dic = {}
+
         for req in target_list:
             for stn in station_list:
                 if stn.doable(req):
@@ -69,25 +71,59 @@ def rule_solver(instance: Prob_Instance) -> dict:
                             dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                         except Exception:
                             dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
-
+                        dist /= req.rchg_amount
                         mpri_dic[dist] = [req, stn]
                     else:
                         try:
                             dist = distance_dic[dic_key(req.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
                         except Exception:
                             dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
-
+                        dist /= req.rchg_amount
                         pri_dic[dist] = [req, stn]
-                else:
-                    dist = PENALTY
 
-        if min(pri_dic.keys()) >= min(mpri_dic.keys()) and pri_dic[min(pri_dic.keys())][1].measures['total_time'] >= mpri_dic[min(mpri_dic.keys())][1].measures['total_time']:
+
+        pri_time = sorted(pri_dic.keys(), key=lambda x:pri_dic[x][1].measures['total_time'], reverse=True)
+
+        if min(pri_dic.keys()) >= min(mpri_dic.keys()) and\
+                max(pri_dic[pri_time[0]][1].measures['total_time'],min(pri_dic.keys())/60) >= (mpri_dic[min(mpri_dic.keys())][1].measures['total_time'] + min(mpri_dic.keys())/60):
             minimum = min(mpri_dic.keys())
             return mpri_dic[minimum][0], mpri_dic[minimum][1]
 
         else:
             minimum = min(pri_dic.keys())
             return pri_dic[minimum][0], pri_dic[minimum][1]
+
+    def su_priority(target_list: List[Request], stn):
+        pri_dic = {}
+
+        for req in target_list:
+                if stn.doable(req):
+                    try:
+                        dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                else:
+                    dist = PENALTY
+
+                dist /= req.rchg_amount
+                pri_dic[dist] = [req, stn]
+
+
+        minimum = min(pri_dic.keys())
+
+        return pri_dic[minimum][0], pri_dic[minimum][1]
+
+    not_move_station = list(filter(lambda x: isinstance(x, MovableStation) is False, stn_list))
+    move_station = list(filter(lambda x: isinstance(x, MovableStation) is True, stn_list))
+
+    for m_stn in move_station:
+        not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
+        pri_req, pri_stn = su_priority(not_completed_reqs,m_stn)
+        try:
+             pri_stn.recharge(pri_req)
+        except Exception:
+            raise Exception('Invalid Logic')
+            break
 
     while any(req.done is False for req in req_list):
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
