@@ -29,7 +29,7 @@ def random_LoadProb(n):
 
     ThisProb = prob.Prob_Instance()
     for i in range(random_req):
-        ThisProb.req_list.append(prob.Request(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 70)))
+        ThisProb.req_list.append(prob.Request(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 70),random.uniform(0, 1)))
 
     for i in range(random_stn):
         ThisProb.stn_list.append(prob.Station(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]))

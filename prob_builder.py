@@ -5,7 +5,7 @@ import pickle
 
 class Prob_Instance:
     def __init__(self):
-        self.objective = 'Total_Time'
+        self.objective = 'Total_Waiting_Time'
         self.req_list = []
         self.stn_list = []
 
@@ -19,9 +19,10 @@ class Prob_Instance:
 
 
 class Request:
-    def __init__(self, ID: int, Loc, Rchg_amount):
+    def __init__(self, ID: int, Loc, Rchg_amount, department_time):
         self.id = ID
         self.loc = Loc
+        self.start_time = department_time
         self.rchg_amount = Rchg_amount
         self.rchg_type = [0, 1, 1]
         self.time_wdw = [0, 10000000]
