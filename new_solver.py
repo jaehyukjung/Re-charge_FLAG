@@ -70,27 +70,31 @@ def rule_solver(instance: Prob_Instance) -> dict:
                             dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                         except Exception:
                             dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
-                        dist /= req.rchg_amount
-                        mpri_dic[dist] = [req, stn]
+
+                        wait_time = abs(min(0, req.start_time - (stn.measures['total_time'] + dist / stn.move_speed)))
+                        pri_dic[wait_time] = [req, stn,dist / req.rchg_amount]
                     else:
                         try:
                             dist = distance_dic[dic_key(req.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
                         except Exception:
                             dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
-                        dist /= req.rchg_amount
-                        pri_dic[dist] = [req, stn]
+                        wait_time = abs(min(0,req.start_time + dist / 60 - stn.measures['total_time']))
+                        pri_dic[wait_time] = [req, stn, dist / req.rchg_amount]
 
 
-        pri_time = sorted(pri_dic.keys(), key=lambda x:pri_dic[x][1].measures['total_time'], reverse=True)
+        pri_time = sorted(pri_dic.keys(), key=lambda x :(x, pri_dic[x][2]))
+        #
+        # if min(pri_dic.keys()) >= min(mpri_dic.keys()) and\
+        #         max(pri_dic[pri_time[0]][1].measures['total_time'],min(pri_dic.keys())/60) >= (mpri_dic[min(mpri_dic.keys())][1].measures['total_time'] + min(mpri_dic.keys())/60):
+        #     minimum = min(mpri_dic.keys())
+        #     return mpri_dic[minimum][0], mpri_dic[minimum][1]
+        #
+        # else:
+        #     minimum = min(pri_dic.keys())
+        #     return pri_dic[minimum][0], pri_dic[minimum][1]
 
-        if min(pri_dic.keys()) >= min(mpri_dic.keys()) and\
-                max(pri_dic[pri_time[0]][1].measures['total_time'],min(pri_dic.keys())/60) >= (mpri_dic[min(mpri_dic.keys())][1].measures['total_time'] + min(mpri_dic.keys())/60):
-            minimum = min(mpri_dic.keys())
-            return mpri_dic[minimum][0], mpri_dic[minimum][1]
+        return pri_dic[pri_time[0]][0], pri_dic[pri_time[0]][1]
 
-        else:
-            minimum = min(pri_dic.keys())
-            return pri_dic[minimum][0], pri_dic[minimum][1]
 
     while any(req.done is False for req in req_list):
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
@@ -106,11 +110,10 @@ def rule_solver(instance: Prob_Instance) -> dict:
     solution['Snapshop_Requests'] = req_list
     solution['Snapshop_Stations'] = stn_list
 
-    maximum = 0
+    total_time = 0
     for stn in stn_list:
-        if stn.measures['total_time'] > maximum:
-            maximum = stn.measures['total_time']
+        total_time += stn.measures['total_wait']
 
-    solution['Objective'] = maximum
+    solution['Objective'] = total_time
 
     return solution

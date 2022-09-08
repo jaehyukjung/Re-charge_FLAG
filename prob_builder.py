@@ -64,8 +64,8 @@ class Station:
         req_distance = distance_dic[dic_key(target.loc, self.loc)]
         self.measures['total_distance'] += req_distance
 
-        self.avail_time = req_distance / 60  # 도착 시간
-        self.measures['total_wait'] += abs(min(0,self.measures['total_time'] - self.avail_time))
+        self.avail_time = target.start_time + req_distance / 60  # 도착 시간
+        self.measures['total_wait'] += abs(min(0,self.avail_time - self.measures['total_time']))
         recharge_speed = max([x * y for x, y in zip(self.rchg_speed, target.rchg_type)])
         recharge_time = target.rchg_amount / recharge_speed  # 주유하는 시간
         self.avail_time = max(self.avail_time, self.measures['total_time'])
@@ -103,7 +103,8 @@ class MovableStation(Station):
         global DIST_FUNC
         req_distance = distance_dic[dic_key(self.loc, target.loc)]
         self.measures['total_distance'] += req_distance
-        self.avail_time = req_distance / self.move_speed # 도착시간
+        self.avail_time = target.start_time + req_distance / self.move_speed # 도착시간
+        self.measures['total_wait'] += abs(min(0, self.avail_time - (self.measures['total_time']+target.start_time)))
         recharge_speed = max([x * y for x, y in zip(self.rchg_speed, target.rchg_type)])  # 주유 속도
         recharge_time = target.rchg_amount / recharge_speed  # 주유 시간
         self.measures['total_time'] += (self.avail_time + recharge_time)  # Movable의 경우 끝난 시간 + 다음 req의 이동시간 +주유시간

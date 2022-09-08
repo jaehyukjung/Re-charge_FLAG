@@ -1,6 +1,6 @@
 import random
 import prob_builder as prob
-import solver, j_solver, s_solver, m_solver, j_test
+import solver, j_solver, s_solver, m_solver, j_test, new_solver
 import pandas as pd
 
 
@@ -53,46 +53,46 @@ if __name__ == '__main__':
         random.seed(n)
         Print_LoadProb(n)
 
-        # print('Random Solver Start')
-        # for i in range(30):
+        # # print('Random Solver Start')
+        # # for i in range(30):
         Sample = random_LoadProb(n)
         Solution = solver.random_rule_solver(Sample)
         random_list.append(round(Solution['Objective'],4))
-        # mean = sum(random_lst)/len(random_lst)
-        # random_lst.append(mean)
-        # print('Solved and objective Mean value is ' + str(mean) + '\n')
+        # # mean = sum(random_lst)/len(random_lst)
+        # # random_lst.append(mean)
+        # # print('Solved and objective Mean value is ' + str(mean) + '\n')
 
         Sample = random_LoadProb(n)
-        Jae_Solution = j_solver.rule_solver(Sample)
+        Jae_Solution = new_solver.rule_solver(Sample)
         jae_list.append(round(Jae_Solution['Objective'], 4))
-
-        Sample = random_LoadProb(n)
-        test_Solution = j_test.rule_solver(Sample)
-        test_list.append(round(test_Solution['Objective'], 4))
-
-
-        Sample = random_LoadProb(n)
-        Su_Solution = s_solver.subin_rule_solver(Sample)
-        su_list.append(Su_Solution)
-
-
-
-        Sample =random_LoadProb(n)
-        Min_Solution = m_solver.minseok_rule_solver(Sample)
-        min_list.append(round(Min_Solution['Objective'], 4))
+        #
+        # Sample = random_LoadProb(n)
+        # test_Solution = j_test.rule_solver(Sample)
+        # test_list.append(round(test_Solution['Objective'], 4))
+        #
+        #
+        # Sample = random_LoadProb(n)
+        # Su_Solution = s_solver.subin_rule_solver(Sample)
+        # su_list.append(Su_Solution)
+        #
+        #
+        #
+        # Sample =random_LoadProb(n)
+        # Min_Solution = m_solver.minseok_rule_solver(Sample)
+        # min_list.append(round(Min_Solution['Objective'], 4))
 
 
         i += 1
 
 
+    #
+    # df = pd.DataFrame(su_list)
+    # df = df.transpose()
+    # solution_dic = {'random': random_list, 'jaehyuk': jae_list, 'test': test_list,'minseok': min_list}
+    # solution_dic = {'jaehyuk': jae_list,}
+    # for i in range(len(su_list)):
+    #     solution_dic['subin'+str((i+1)*10)] = su_list[i]
 
-    df = pd.DataFrame(su_list)
-    df = df.transpose()
-    solution_dic = {'random': random_list, 'jaehyuk': jae_list, 'test': test_list,'minseok': min_list}
-
-    for i in range(len(su_list)):
-        solution_dic['subin'+str((i+1)*10)] = su_list[i]
-
-
+    solution_dic = {'random': random_list,'jaehyuk': jae_list }
     df = pd.DataFrame(solution_dic)
     df.to_csv("output_pd.csv", encoding='cp949')
