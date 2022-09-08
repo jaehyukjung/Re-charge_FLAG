@@ -49,6 +49,7 @@ class Station:
         self.priority = -1
         self.measures = {}
         self.measures['total_distance'] = 0
+        self.measures['total_wait'] = 0
         self.served_req = []
         self.can_recharge = True
         self.measures['total_time'] = 0  # 추가
@@ -62,10 +63,12 @@ class Station:
         target.done = True
         req_distance = distance_dic[dic_key(target.loc, self.loc)]
         self.measures['total_distance'] += req_distance
+
         self.avail_time = req_distance / 60  # 도착 시간
+        self.measures['total_wait'] += abs(min(0,self.measures['total_time'] - self.avail_time))
         recharge_speed = max([x * y for x, y in zip(self.rchg_speed, target.rchg_type)])
         recharge_time = target.rchg_amount / recharge_speed  # 주유하는 시간
-        self.avail_time = max(self.avail_time, self.measures['total_time']) # 일반 station의 경우 주유 시작 가능시간이 이전 req의 주유가 끝난 시점과 자신의 이동시간 중 오래 걸리는 것으로 설정.
+        self.avail_time = max(self.avail_time, self.measures['total_time'])
         self.measures['total_time'] = self.avail_time + recharge_time
         target.loc = self.loc
         self.now_capacity -= target.rchg_amount
