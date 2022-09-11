@@ -1,11 +1,13 @@
 import os.path
-import random
 from prob_builder import *
 from typing import List
 import pickle
 PENALTY = 1000000
 
-def random_rule_solver(instance: Prob_Instance) -> dict:
+
+# 재혁
+def rule_solver(instance: Prob_Instance) -> dict:
+    print('Solver Start')
     solution = {}
     solution['Problem'] = instance.deepcopy()
 
@@ -18,7 +20,6 @@ def random_rule_solver(instance: Prob_Instance) -> dict:
     stn: Station
     for stn in stn_list:
         stn.initialize()
-
 
     if not os.path.exists('dist.p'):
         distance_dic = {}
@@ -57,19 +58,39 @@ def random_rule_solver(instance: Prob_Instance) -> dict:
         with open('dist.p', 'wb') as file:
             pickle.dump(distance_dic, file)
 
+    def priority(req, station_list: List[Station]):
+        pri_dic = {}
 
-    def random_priority(target, station_list: List[Station]):
         for stn in station_list:
-            stn.priority = random.randint(1,1000000)
+            if stn.doable(req):
+                if isinstance(stn, MovableStation):
+                    try:
+                        dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                    dist /= req.rchg_amount
+                else:
+                    try:
+                        dist = distance_dic[dic_key(req.loc, stn.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        dist = (get_distance_lat(req.loc, stn.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                    dist /= req.rchg_amount
 
-        return target, min(station_list, key = lambda x: x.priority)
+            pri_dic[dist] = [req, stn]
+
+        minimum = min(pri_dic.keys())
+
+        return pri_dic[minimum][0], pri_dic[minimum][1]
+
 
 
     while any(req.done is False for req in req_list):
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
         pri_req = min(not_completed_reqs,key = lambda x: (x.start_time))
         servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list))
-        pri_req, pri_stn = random_priority(pri_req,servable_stn) # 랜덤
+
+        pri_req, pri_stn = priority(pri_req,servable_stn) # 재혁
+
         try:
              pri_stn.recharge(pri_req)
         except Exception:

@@ -128,12 +128,12 @@ def subin_rule_solver(instance: Prob_Instance) -> dict:
         solution['Snapshop_Requests'] = req_list
         solution['Snapshop_Stations'] = stn_list
 
-        maximum = 0
+        total_time = 0
         for stn in stn_list:
-            if stn.measures['total_time'] > maximum:
-                maximum = stn.measures['total_time']
+            total_time += stn.measures['total_wait']
 
-        solution['Objective'] = maximum
-        solution1.append(round(maximum,4))
+        solution['Objective'] = total_time
+
+        solution1.append(round(total_time,4))
 
     return solution1

@@ -58,48 +58,38 @@ def rule_solver(instance: Prob_Instance) -> dict:
         with open('dist.p', 'wb') as file:
             pickle.dump(distance_dic, file)
 
-    def priority(target_list: List[Request], station_list: List[Station]):
+    def priority(target, station_list: List[Station]):
         pri_dic = {}
-        mpri_dic = {}
 
-        for req in target_list:
-            for stn in station_list:
-                if stn.doable(req):
-                    if isinstance(stn, MovableStation):
-                        try:
-                            dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
-                        except Exception:
-                            dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
-
-                        wait_time = abs(min(0, req.start_time - (stn.measures['total_time'] + dist / stn.move_speed)))
-                        pri_dic[wait_time] = [req, stn,dist / req.rchg_amount]
-                    else:
-                        try:
-                            dist = distance_dic[dic_key(req.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
-                        except Exception:
-                            dist = (get_distance_lat(req.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
-                        wait_time = abs(min(0,req.start_time + dist / 60 - stn.measures['total_time']))
-                        pri_dic[wait_time] = [req, stn, dist / req.rchg_amount]
+        for stn in station_list:
+            if stn.doable(req):
+                if isinstance(stn, MovableStation):
+                    try:
+                        dist = distance_dic[dic_key(stn.loc, target.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        dist = (get_distance_lat(stn.loc, target.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                    wait_time = abs(min(0, target.start_time - stn.measures['total_time']))
+                    pri_dic[wait_time] = [target, stn,dist / target.rchg_amount]
+                else:
+                    try:
+                        dist = distance_dic[dic_key(target.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        dist = (get_distance_lat(target.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
+                    wait_time = abs(min(0,target.start_time + dist / 60 - stn.measures['total_time']))
+                    pri_dic[wait_time ] = [target, stn, dist / target.rchg_amount]
 
 
         pri_time = sorted(pri_dic.keys(), key=lambda x :(x, pri_dic[x][2]))
-        #
-        # if min(pri_dic.keys()) >= min(mpri_dic.keys()) and\
-        #         max(pri_dic[pri_time[0]][1].measures['total_time'],min(pri_dic.keys())/60) >= (mpri_dic[min(mpri_dic.keys())][1].measures['total_time'] + min(mpri_dic.keys())/60):
-        #     minimum = min(mpri_dic.keys())
-        #     return mpri_dic[minimum][0], mpri_dic[minimum][1]
-        #
-        # else:
-        #     minimum = min(pri_dic.keys())
-        #     return pri_dic[minimum][0], pri_dic[minimum][1]
 
         return pri_dic[pri_time[0]][0], pri_dic[pri_time[0]][1]
 
 
     while any(req.done is False for req in req_list):
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
+        pri_req = min(not_completed_reqs,key = lambda x: (x.start_time))
         servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list))
-        pri_req, pri_stn = priority(not_completed_reqs,servable_stn) # 재혁
+
+        pri_req, pri_stn = priority(pri_req,servable_stn) # 재혁
 
         try:
              pri_stn.recharge(pri_req)

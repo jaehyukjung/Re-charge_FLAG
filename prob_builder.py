@@ -24,7 +24,6 @@ class Request:
         self.loc = Loc
         self.start_time = department_time
         self.rchg_amount = Rchg_amount
-        self.rchg_type = [0, 1, 1]
         self.time_wdw = [0, 10000000]
         self.speed = 60
 
@@ -40,8 +39,7 @@ class Station:
         self.loc = Loc
         self.max_capacity = 100000
         self.avail_time = 0
-        self.rchg_speed = [100, 50, 6]  # Different Charging Speed
-        self.rchg_cost = [0, 7.5, 0.8225]  # Different Charging Cost
+        self.rchg_speed = 50 # Different Charging Speed
         self.origin = []  # Original Station's Location
 
     def initialize(self):
@@ -66,8 +64,7 @@ class Station:
 
         self.avail_time = target.start_time + req_distance / 60  # 도착 시간
         self.measures['total_wait'] += abs(min(0,self.avail_time - self.measures['total_time']))
-        recharge_speed = max([x * y for x, y in zip(self.rchg_speed, target.rchg_type)])
-        recharge_time = target.rchg_amount / recharge_speed  # 주유하는 시간
+        recharge_time = target.rchg_amount / self.rchg_speed  # 주유하는 시간
         self.avail_time = max(self.avail_time, self.measures['total_time'])
         self.measures['total_time'] = self.avail_time + recharge_time
         target.loc = self.loc
@@ -103,8 +100,8 @@ class MovableStation(Station):
         global DIST_FUNC
         req_distance = distance_dic[dic_key(self.loc, target.loc)]
         self.measures['total_distance'] += req_distance
-        self.avail_time = target.start_time + req_distance / self.move_speed # 도착시간
-        self.measures['total_wait'] += abs(min(0, self.avail_time - (self.measures['total_time']+target.start_time)))
+        self.avail_time = target.start_time # 도착시간
+        self.measures['total_wait'] += abs(min(0, self.avail_time - (self.measures['total_time'])))
         recharge_speed = max([x * y for x, y in zip(self.rchg_speed, target.rchg_type)])  # 주유 속도
         recharge_time = target.rchg_amount / recharge_speed  # 주유 시간
         self.measures['total_time'] += (self.avail_time + recharge_time)  # Movable의 경우 끝난 시간 + 다음 req의 이동시간 +주유시간

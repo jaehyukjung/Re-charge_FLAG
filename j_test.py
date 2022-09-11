@@ -138,12 +138,18 @@ def rule_solver(instance: Prob_Instance) -> dict:
 
     solution['Snapshop_Requests'] = req_list
     solution['Snapshop_Stations'] = stn_list
-
-    maximum = 0
+    #
+    # maximum = 0
+    # for stn in stn_list:
+    #     if stn.measures['total_time'] > maximum:
+    #         maximum = stn.measures['total_time']
+    #
+    # solution['Objective'] = maximum
+    total_time = 0
     for stn in stn_list:
-        if stn.measures['total_time'] > maximum:
-            maximum = stn.measures['total_time']
+        total_time += stn.measures['total_wait']
 
-    solution['Objective'] = maximum
+    solution['Objective'] = total_time
+
 
     return solution
