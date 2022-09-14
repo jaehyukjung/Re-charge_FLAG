@@ -100,10 +100,16 @@ def rule_solver(instance: Prob_Instance) -> dict:
     solution['Snapshop_Requests'] = req_list
     solution['Snapshop_Stations'] = stn_list
 
-    total_time = 0
+    total_wait = 0
+    total_distance = 0
+    max_stn = max(stn_list, key= lambda x: x.measures['total_time'])
+
     for stn in stn_list:
-        total_time += stn.measures['total_wait']
+        total_distance += stn.measures['total_distance']
+        total_wait += stn.measures['total_wait']
 
-    solution['Objective'] = total_time
-
+    solution['Objective'] = []
+    solution['Objective'].append(max_stn.measures['total_time'])
+    solution['Objective'].append(total_wait)
+    solution['Objective'].append((total_distance))
     return solution

@@ -29,7 +29,7 @@ def random_LoadProb(n):
 
     ThisProb = prob.Prob_Instance()
     for i in range(random_req):
-        ThisProb.req_list.append(prob.Request(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 70),random.uniform(0, 1)))
+        ThisProb.req_list.append(prob.Request(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 70), random.uniform(0.001, 3.99)))
 
     for i in range(random_stn):
         ThisProb.stn_list.append(prob.Station(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]))
@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     random.seed(42)
     i = 0
-    jae_list, only_dist_list, random_list, test_list = [], [], [], []
+    jae_list, only_dist_list, random_list, test_list = [[], [], []], [[], [], []],[[], [], []],[[], [], []]
 
     while(i < 10):
         n = random.randint(1,1000)
@@ -55,20 +55,33 @@ if __name__ == '__main__':
 
         Sample = random_LoadProb(n)
         Solution = solver.random_rule_solver(Sample)
-        random_list.append(round(Solution['Objective'],4))
+        random_list[0].append(round(Solution['Objective'][0],4))
+        random_list[1].append(round(Solution['Objective'][1], 4))
+        random_list[2].append(round(Solution['Objective'][2], 4))
 
         Sample = random_LoadProb(n)
         Jae_Solution = new_solver.rule_solver(Sample)
-        jae_list.append(round(Jae_Solution['Objective'], 4))
+        jae_list[0].append(round(Jae_Solution['Objective'][0], 4))
+        jae_list[1].append(round(Jae_Solution['Objective'][1], 4))
+        jae_list[2].append(round(Jae_Solution['Objective'][2], 4))
 
         Sample =random_LoadProb(n)
         Dist_Solution = dist_solver.rule_solver(Sample)
-        only_dist_list.append(round(Dist_Solution['Objective'], 4))
-
+        only_dist_list[0].append(round(Dist_Solution['Objective'][0], 4))
+        only_dist_list[1].append(round(Dist_Solution['Objective'][1], 4))
+        only_dist_list[2].append(round(Dist_Solution['Objective'][2], 4))
 
         i += 1
 
 
-    solution_dic = {'random': random_list,'jaehyuk': jae_list,'dist': only_dist_list}
+    solution_dic = {'random': random_list[0],'jaehyuk': jae_list[0],'dist': only_dist_list[0]}
     df = pd.DataFrame(solution_dic)
-    df.to_csv("output_pd.csv", encoding='cp949')
+    df.to_csv("total_time_pd.csv", encoding='cp949')
+
+    solution_dic = {'random': random_list[1], 'jaehyuk': jae_list[1], 'dist': only_dist_list[1]}
+    df = pd.DataFrame(solution_dic)
+    df.to_csv("wait_time_pd.csv", encoding='cp949')
+
+    solution_dic = {'random': random_list[2], 'jaehyuk': jae_list[2], 'dist': only_dist_list[2]}
+    df = pd.DataFrame(solution_dic)
+    df.to_csv("total_distance_pd.csv", encoding='cp949')

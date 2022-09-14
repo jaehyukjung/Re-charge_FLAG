@@ -69,20 +69,22 @@ def rule_solver(instance: Prob_Instance) -> dict:
                     except Exception:
                         dist = (get_distance_lat(stn.loc, target.loc))  # 위의 딕셔너리에서 값 바로 가져오기
                     # wait_time = abs(min(0, target.start_time - stn.measures['total_time']))
-                    wait_time = max(stn.measures['total_time'] , target.start_time) + dist / 60 + target.rchg_amount / stn.rchg_speed
+                    wait_time = max(stn.measures['total_time'] , target.start_time) + dist / stn.move_speed
                     pri_dic[wait_time] = [target, stn,dist]
+                    target.time_list.append(wait_time)
                 else:
                     try:
                         dist = distance_dic[dic_key(target.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
                         dist = (get_distance_lat(target.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
                     # wait_time = abs(min(0,target.start_time + dist / 60 - stn.measures['total_time']))
-                    wait_time = max(stn.measures['total_time'],(target.start_time + dist / 60)) + target.rchg_amount / stn.rchg_speed
+                    wait_time = max(stn.measures['total_time'],(target.start_time + dist / 60))
                     pri_dic[wait_time] = [target, stn, dist]
+                    target.time_list.append(wait_time)
 
 
         # pri_time = sorted(pri_dic.keys(), key=lambda x :(x, pri_dic[x][2]))
-        pri_time = sorted(pri_dic.keys())
+        pri_time = sorted(pri_dic.keys(),key = lambda x:(x,pri_dic[x][2]))
 
         return pri_dic[pri_time[0]][0], pri_dic[pri_time[0]][1]
 
@@ -103,13 +105,16 @@ def rule_solver(instance: Prob_Instance) -> dict:
     solution['Snapshop_Requests'] = req_list
     solution['Snapshop_Stations'] = stn_list
 
-    total_time = 0
+    total_wait = 0
+    total_distance = 0
     max_stn = max(stn_list, key= lambda x: x.measures['total_time'])
 
-    # for stn in stn_list:
-    #     stn_time.append(stn.measures['total_time'])
-    #     total_time += stn.measures['total_wait']
+    for stn in stn_list:
+        total_distance += stn.measures['total_distance']
+        total_wait += stn.measures['total_wait']
 
-    solution['Objective'] = max_stn.measures['total_time']
-
+    solution['Objective'] = []
+    solution['Objective'].append(max_stn.measures['total_time'])
+    solution['Objective'].append(total_wait)
+    solution['Objective'].append((total_distance))
     return solution

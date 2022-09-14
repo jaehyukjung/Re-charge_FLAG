@@ -22,7 +22,7 @@ class Request:
     def __init__(self, ID: int, Loc, Rchg_amount, department_time):
         self.id = ID
         self.loc = Loc
-        self.start_time = department_time
+        self.start_time1 = department_time
         self.rchg_amount = Rchg_amount
         self.time_wdw = [0, 10000000]
         self.speed = 60
@@ -30,7 +30,8 @@ class Request:
     def initialize(self):
         self.done = False
         self.priority = -1
-        self.start_time = -1
+        self.start_time = self.start_time1
+        self.time_list = []
 
 
 class Station:
@@ -63,7 +64,7 @@ class Station:
         self.measures['total_distance'] += req_distance
 
         self.avail_time = target.start_time + req_distance / 60  # 도착 시간
-        self.measures['total_wait'] += abs(min(0,self.avail_time - self.measures['total_time']))
+        self.measures['total_wait'] += max(self.avail_time , self.measures['total_time']) - target.start_time
         recharge_time = target.rchg_amount / self.rchg_speed  # 주유하는 시간
         self.avail_time = max(self.avail_time, self.measures['total_time'])
         self.measures['total_time'] = self.avail_time + recharge_time
@@ -100,11 +101,10 @@ class MovableStation(Station):
         global DIST_FUNC
         req_distance = distance_dic[dic_key(self.loc, target.loc)]
         self.measures['total_distance'] += req_distance
-        self.avail_time = target.start_time # 도착시간
-        self.measures['total_wait'] += abs(min(0, self.avail_time - (self.measures['total_time'])))
-        recharge_speed = max([x * y for x, y in zip(self.rchg_speed, target.rchg_type)])  # 주유 속도
-        recharge_time = target.rchg_amount / recharge_speed  # 주유 시간
-        self.measures['total_time'] += (self.avail_time + recharge_time)  # Movable의 경우 끝난 시간 + 다음 req의 이동시간 +주유시간
+        self.avail_time = max(target.start_time,self.measures['total_time']) + req_distance/self.move_speed # 도착시간
+        recharge_time = target.rchg_amount / self.rchg_speed  # 주유하는 시간
+        self.measures['total_wait'] += max(self.avail_time, (self.measures['total_time'])) - target.start_time + recharge_time
+        self.measures['total_time'] = (self.avail_time + recharge_time)  # Movable의 경우 끝난 시간 + 다음 req의 이동시간 +주유시간
         self.loc = target.loc
         self.now_capacity -= target.rchg_amount
         self.served_req.append(target.id)
