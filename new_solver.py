@@ -62,24 +62,27 @@ def rule_solver(instance: Prob_Instance) -> dict:
         pri_dic = {}
 
         for stn in station_list:
-            if stn.doable(req):
+            if stn.doable(target):
                 if isinstance(stn, MovableStation):
                     try:
                         dist = distance_dic[dic_key(stn.loc, target.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
                         dist = (get_distance_lat(stn.loc, target.loc))  # 위의 딕셔너리에서 값 바로 가져오기
-                    wait_time = abs(min(0, target.start_time - stn.measures['total_time']))
-                    pri_dic[wait_time] = [target, stn,dist / target.rchg_amount]
+                    # wait_time = abs(min(0, target.start_time - stn.measures['total_time']))
+                    wait_time = max(stn.measures['total_time'] , target.start_time) + dist / 60 + target.rchg_amount / stn.rchg_speed
+                    pri_dic[wait_time] = [target, stn,dist]
                 else:
                     try:
                         dist = distance_dic[dic_key(target.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
                         dist = (get_distance_lat(target.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
-                    wait_time = abs(min(0,target.start_time + dist / 60 - stn.measures['total_time']))
-                    pri_dic[wait_time ] = [target, stn, dist / target.rchg_amount]
+                    # wait_time = abs(min(0,target.start_time + dist / 60 - stn.measures['total_time']))
+                    wait_time = max(stn.measures['total_time'],(target.start_time + dist / 60)) + target.rchg_amount / stn.rchg_speed
+                    pri_dic[wait_time] = [target, stn, dist]
 
 
-        pri_time = sorted(pri_dic.keys(), key=lambda x :(x, pri_dic[x][2]))
+        # pri_time = sorted(pri_dic.keys(), key=lambda x :(x, pri_dic[x][2]))
+        pri_time = sorted(pri_dic.keys())
 
         return pri_dic[pri_time[0]][0], pri_dic[pri_time[0]][1]
 
@@ -101,9 +104,12 @@ def rule_solver(instance: Prob_Instance) -> dict:
     solution['Snapshop_Stations'] = stn_list
 
     total_time = 0
-    for stn in stn_list:
-        total_time += stn.measures['total_wait']
+    max_stn = max(stn_list, key= lambda x: x.measures['total_time'])
 
-    solution['Objective'] = total_time
+    # for stn in stn_list:
+    #     stn_time.append(stn.measures['total_time'])
+    #     total_time += stn.measures['total_wait']
+
+    solution['Objective'] = max_stn.measures['total_time']
 
     return solution
