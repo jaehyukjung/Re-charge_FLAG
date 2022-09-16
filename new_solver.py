@@ -3,7 +3,7 @@ from prob_builder import *
 from typing import List
 import pickle
 PENALTY = 1000000
-
+global distance_dic
 
 # 재혁
 def rule_solver(instance: Prob_Instance) -> dict:
@@ -20,6 +20,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
     stn: Station
     for stn in stn_list:
         stn.initialize()
+    global distance_dic
 
     if not os.path.exists('dist.p'):
         distance_dic = {}
@@ -58,6 +59,9 @@ def rule_solver(instance: Prob_Instance) -> dict:
         with open('dist.p', 'wb') as file:
             pickle.dump(distance_dic, file)
 
+
+
+
     def priority(target, station_list: List[Station]):
         pri_dic = {}
 
@@ -87,7 +91,10 @@ def rule_solver(instance: Prob_Instance) -> dict:
         pri_time = sorted(pri_dic.keys(),key = lambda x:(x,pri_dic[x][2]))
 
         return pri_dic[pri_time[0]][0], pri_dic[pri_time[0]][1]
-
+    # ==================================================================
+    for req in req_list:
+        req.get_all_distacne(stn_list)
+    # ==================================================================
 
     while any(req.done is False for req in req_list):
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))

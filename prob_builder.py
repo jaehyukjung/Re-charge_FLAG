@@ -2,6 +2,7 @@ import copy
 import requests
 import json
 import pickle
+import new_solver
 
 class Prob_Instance:
     def __init__(self):
@@ -24,16 +25,29 @@ class Request:
         self.loc = Loc
         self.start_time1 = department_time
         self.rchg_amount = Rchg_amount
-        self.time_wdw = [0, 10000000]
+        # ==================================================================
+        self.time_wdw = [department_time, department_time+Rchg_amount/50] #타임 윈도우 설정
         self.speed = 60
-
+        self.dist_list = []
+        # ==================================================================
     def initialize(self):
         self.done = False
         self.priority = -1
         self.start_time = self.start_time1
-        self.time_list = []
+    # ==================================================================
+    def get_all_distacne(self,station_list):
+        distance_dic = new_solver.distance_dic
 
+        for stn in station_list:
+            if isinstance(stn, MovableStation):
+                self.dist_list.append(distance_dic[dic_key(stn.loc, self.loc)])
+            else:
+                self.dist_list.append(distance_dic[dic_key(self.loc, stn.loc)])
 
+        spare_time = (sum(self.dist_list)/len(self.dist_list)) / self.speed
+
+        self.time_wdw[1] += spare_time
+    # ==================================================================
 class Station:
     def __init__(self, ID: int, Loc):
         self.id = ID
