@@ -3,7 +3,6 @@ from prob_builder import *
 from typing import List
 import pickle
 PENALTY = 1000000
-global distance_dic
 
 # 재혁
 def rule_solver(instance: Prob_Instance) -> dict:
@@ -20,7 +19,6 @@ def rule_solver(instance: Prob_Instance) -> dict:
     stn: Station
     for stn in stn_list:
         stn.initialize()
-    global distance_dic
 
     if not os.path.exists('dist.p'):
         distance_dic = {}
@@ -63,28 +61,35 @@ def rule_solver(instance: Prob_Instance) -> dict:
 
 
     def priority(target, station_list: List[Station]):
+        not_move_station = list(filter(lambda x: isinstance(x, MovableStation) is False, station_list))
+        move_station = list(filter(lambda x: isinstance(x, MovableStation) is True, station_list))
         pri_dic = {}
 
-        for stn in station_list:
+        for stn in not_move_station:
             if stn.doable(target):
-                if isinstance(stn, MovableStation):
+                try:
+                    dist = distance_dic[dic_key(target.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
+                except Exception:
+                    dist = (get_distance_lat(target.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
+                # wait_time = abs(min(0,target.start_time + dist / 60 - stn.measures['total_time']))
+                start_time = max(stn.measures['total_time'],(target.start_time + dist / 60))
+
+                tardiness_time = max(0,(start_time + (target.rchg_amount / stn.rchg_speed) - target.time_wdw[1]))
+                pri_dic[tardiness_time] = [target, stn, dist]
+                target.dist_list.append(tardiness_time)
+
+        if 0 not in target.dist_list:
+            for stn in move_station:
+                if stn.doable(target):
                     try:
                         dist = distance_dic[dic_key(stn.loc, target.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
                         dist = (get_distance_lat(stn.loc, target.loc))  # 위의 딕셔너리에서 값 바로 가져오기
                     # wait_time = abs(min(0, target.start_time - stn.measures['total_time']))
-                    wait_time = max(stn.measures['total_time'] , target.start_time) + dist / stn.move_speed
-                    pri_dic[wait_time] = [target, stn,dist]
-                    target.time_list.append(wait_time)
-                else:
-                    try:
-                        dist = distance_dic[dic_key(target.loc, stn.loc)] # 위의 딕셔너리에서 값 바로 가져오기
-                    except Exception:
-                        dist = (get_distance_lat(target.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
-                    # wait_time = abs(min(0,target.start_time + dist / 60 - stn.measures['total_time']))
-                    wait_time = max(stn.measures['total_time'],(target.start_time + dist / 60))
-                    pri_dic[wait_time] = [target, stn, dist]
-                    target.time_list.append(wait_time)
+                    start_time = max(stn.measures['total_time'], target.start_time) + dist / stn.move_speed
+                    tardiness_time = max(0, (start_time + (target.rchg_amount / stn.rchg_speed) - target.time_wdw[1]))
+                    pri_dic[tardiness_time] = [target, stn, dist]
+                    target.dist_list.append(tardiness_time)
 
 
         # pri_time = sorted(pri_dic.keys(), key=lambda x :(x, pri_dic[x][2]))
@@ -93,8 +98,17 @@ def rule_solver(instance: Prob_Instance) -> dict:
         return pri_dic[pri_time[0]][0], pri_dic[pri_time[0]][1]
     # ==================================================================
     for req in req_list:
-        req.get_all_distacne(stn_list)
+        for stn in stn_list:
+            if isinstance(stn, MovableStation):
+                req.dist_list.append(distance_dic[dic_key(stn.loc, req.loc)])
+            else:
+                req.dist_list.append(distance_dic[dic_key(req.loc, stn.loc)])
+
+        spare_time = (sum(req.dist_list)/len(req.dist_list)) / req.speed
+
+        req.time_wdw[1] += spare_time
     # ==================================================================
+
 
     while any(req.done is False for req in req_list):
         not_completed_reqs = list(filter(lambda x: (x.done is False), req_list))
@@ -115,13 +129,20 @@ def rule_solver(instance: Prob_Instance) -> dict:
     total_wait = 0
     total_distance = 0
     max_stn = max(stn_list, key= lambda x: x.measures['total_time'])
+    total_tardiness = 0
 
     for stn in stn_list:
         total_distance += stn.measures['total_distance']
         total_wait += stn.measures['total_wait']
 
+    for req in req_list:
+        total_tardiness += req.tardiness
+
     solution['Objective'] = []
+    solution['Objective'].append(total_tardiness)
     solution['Objective'].append(max_stn.measures['total_time'])
     solution['Objective'].append(total_wait)
     solution['Objective'].append((total_distance))
+
+
     return solution

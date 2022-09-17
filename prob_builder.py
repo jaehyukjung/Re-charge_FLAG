@@ -2,7 +2,7 @@ import copy
 import requests
 import json
 import pickle
-import new_solver
+
 
 class Prob_Instance:
     def __init__(self):
@@ -29,25 +29,13 @@ class Request:
         self.time_wdw = [department_time, department_time+Rchg_amount/50] #타임 윈도우 설정
         self.speed = 60
         self.dist_list = []
+        self.tardiness = 0
         # ==================================================================
     def initialize(self):
         self.done = False
         self.priority = -1
         self.start_time = self.start_time1
-    # ==================================================================
-    def get_all_distacne(self,station_list):
-        distance_dic = new_solver.distance_dic
 
-        for stn in station_list:
-            if isinstance(stn, MovableStation):
-                self.dist_list.append(distance_dic[dic_key(stn.loc, self.loc)])
-            else:
-                self.dist_list.append(distance_dic[dic_key(self.loc, stn.loc)])
-
-        spare_time = (sum(self.dist_list)/len(self.dist_list)) / self.speed
-
-        self.time_wdw[1] += spare_time
-    # ==================================================================
 class Station:
     def __init__(self, ID: int, Loc):
         self.id = ID
@@ -81,6 +69,7 @@ class Station:
         self.measures['total_wait'] += max(self.avail_time , self.measures['total_time']) - target.start_time
         recharge_time = target.rchg_amount / self.rchg_speed  # 주유하는 시간
         self.avail_time = max(self.avail_time, self.measures['total_time'])
+        target.tardiness = max(0,self.measures['total_time']-target.time_wdw[1])
         self.measures['total_time'] = self.avail_time + recharge_time
         target.loc = self.loc
         self.now_capacity -= target.rchg_amount

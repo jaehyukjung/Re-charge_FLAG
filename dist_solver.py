@@ -81,6 +81,18 @@ def rule_solver(instance: Prob_Instance) -> dict:
         minimum = min(pri_dic.keys())
 
         return pri_dic[minimum][0], pri_dic[minimum][1]
+    # ==================================================================
+    for req in req_list:
+        for stn in stn_list:
+            if isinstance(stn, MovableStation):
+                req.dist_list.append(distance_dic[dic_key(stn.loc, req.loc)])
+            else:
+                req.dist_list.append(distance_dic[dic_key(req.loc, stn.loc)])
+
+        spare_time = (sum(req.dist_list)/len(req.dist_list)) / req.speed
+
+        req.time_wdw[1] += spare_time
+    # ==================================================================
 
 
 
@@ -103,12 +115,17 @@ def rule_solver(instance: Prob_Instance) -> dict:
     total_wait = 0
     total_distance = 0
     max_stn = max(stn_list, key= lambda x: x.measures['total_time'])
+    total_tardiness = 0
 
     for stn in stn_list:
         total_distance += stn.measures['total_distance']
         total_wait += stn.measures['total_wait']
 
+    for req in req_list:
+        total_tardiness += req.tardiness
+
     solution['Objective'] = []
+    solution['Objective'].append(total_tardiness)
     solution['Objective'].append(max_stn.measures['total_time'])
     solution['Objective'].append(total_wait)
     solution['Objective'].append((total_distance))
