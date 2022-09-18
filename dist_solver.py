@@ -58,6 +58,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
         with open('dist.p', 'wb') as file:
             pickle.dump(distance_dic, file)
 
+
     def priority(req, station_list: List[Station]):
         pri_dic = {}
 
