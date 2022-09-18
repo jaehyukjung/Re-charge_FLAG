@@ -59,25 +59,31 @@ def rule_solver(instance: Prob_Instance) -> dict:
             pickle.dump(distance_dic, file)
 
 
-    def priority(req, station_list: List[Station]):
+    def priority(target, station_list: List[Station]):
         pri_dic = {}
 
         for stn in station_list:
-            if stn.doable(req):
+            if stn.doable(target):
                 if isinstance(stn, MovableStation):
                     try:
-                        dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                        origin_dist = distance_dic[dic_key(stn.start_loc, target.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
-                        dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
-                    # dist /= req.rchg_amount
+                        origin_dist = (get_distance_lat(stn.start_loc, target.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                    # wait_time = abs(min(0, target.start_time - stn.measures['total_time']))
+                    if origin_dist < 50:  # m_stn의 초기 위치에서 벗어나지 않는다면 실행. 2km 이내
+                        try:
+                            dist = distance_dic[dic_key(stn.loc, target.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                        except Exception:
+                            dist = (get_distance_lat(stn.loc, target.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+
                 else:
                     try:
-                        dist = distance_dic[dic_key(req.loc, stn.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                        dist = distance_dic[dic_key(target.loc, stn.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
-                        dist = (get_distance_lat(req.loc, stn.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+                        dist = (get_distance_lat(target.loc, stn.loc))  # 위의 딕셔너리에서 값 바로 가져오기
                     # dist /= req.rchg_amount
 
-            pri_dic[dist] = [req, stn]
+            pri_dic[dist] = [target, stn]
 
         minimum = min(pri_dic.keys())
 
