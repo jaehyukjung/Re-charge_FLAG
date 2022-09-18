@@ -68,13 +68,13 @@ def rule_solver(instance: Prob_Instance) -> dict:
                         dist = distance_dic[dic_key(stn.loc, req.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
                         dist = (get_distance_lat(stn.loc, req.loc))  # 위의 딕셔너리에서 값 바로 가져오기
-                    dist /= req.rchg_amount
+                    # dist /= req.rchg_amount
                 else:
                     try:
                         dist = distance_dic[dic_key(req.loc, stn.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
                         dist = (get_distance_lat(req.loc, stn.loc))  # 위의 딕셔너리에서 값 바로 가져오기
-                    dist /= req.rchg_amount
+                    # dist /= req.rchg_amount
 
             pri_dic[dist] = [req, stn]
 
@@ -101,7 +101,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
         pri_req = min(not_completed_reqs,key = lambda x: (x.start_time))
         servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list))
 
-        pri_req, pri_stn = priority(pri_req,servable_stn) # 재혁
+        pri_req, pri_stn = priority(pri_req, servable_stn)  # 재혁
 
         try:
              pri_stn.recharge(pri_req)

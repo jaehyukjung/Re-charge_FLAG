@@ -31,7 +31,7 @@ def random_LoadProb(n):
     for i in range(random_req):
         ThisProb.req_list.append(prob.Request(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 70), random.uniform(0.001, 3.99)))
     for i in range(int(random_req/2)):
-        ThisProb.req_list.append(prob.Request(random_req+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 70), random.uniform(1.001, 1.99)))
+        ThisProb.req_list.append(prob.Request(random_req+1+i, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 70), random.uniform(1.001, 1.99)))
 
     for i in range(random_stn):
         ThisProb.stn_list.append(prob.Station(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]))
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     random.seed(42)
     i = 0
-    jae_list, only_dist_list, random_list, test_list = [[], [], [],[]], [[], [], [],[]],[[], [], [],[]],[[], [], [],[]]
+    jae_list, only_dist_list, random_list = [[], [], [],[]], [[], [], [],[]],[[], [], [],[]]
 
     while(i < 30):
         n = random.randint(1,1000)
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         jae_list[2].append(round(Jae_Solution['Objective'][2], 4))
         jae_list[3].append(round(Jae_Solution['Objective'][3], 4))
 
-        Sample =random_LoadProb(n)
+        Sample = random_LoadProb(n)
         Dist_Solution = dist_solver.rule_solver(Sample)
         only_dist_list[0].append(round(Dist_Solution['Objective'][0], 4))
         only_dist_list[1].append(round(Dist_Solution['Objective'][1], 4))
