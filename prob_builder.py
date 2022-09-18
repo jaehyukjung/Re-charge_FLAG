@@ -91,6 +91,7 @@ class MovableStation(Station):
     def __init__(self, ID, Loc, moveSpeed=40):
         Station.__init__(self, ID, Loc)
         self.move_speed = moveSpeed
+        self.start_loc = Loc
 
     def initialize(self):
         Station.initialize(self)

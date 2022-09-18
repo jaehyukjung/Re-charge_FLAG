@@ -73,10 +73,11 @@ def rule_solver(instance: Prob_Instance) -> dict:
                     dist = (get_distance_lat(target.loc, stn.loc)) # 위의 딕셔너리에서 값 바로 가져오기
                 # wait_time = abs(min(0,target.start_time + dist / 60 - stn.measures['total_time']))
                 start_time = max(stn.measures['total_time'],(target.start_time + dist / 60))
-
                 tardiness_time = max(0,(start_time + (target.rchg_amount / stn.rchg_speed) - target.time_wdw[1]))
                 pri_dic[tardiness_time] = [target, stn, dist]
                 target.dist_list.append(tardiness_time)
+
+
 
         if 0 not in target.dist_list:
             for stn in move_station:
@@ -85,11 +86,17 @@ def rule_solver(instance: Prob_Instance) -> dict:
                         dist = distance_dic[dic_key(stn.loc, target.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
                     except Exception:
                         dist = (get_distance_lat(stn.loc, target.loc))  # 위의 딕셔너리에서 값 바로 가져오기
+
+                    try:
+                        origin_dist = distance_dic[dic_key(stn.start_loc, target.loc)]  # 위의 딕셔너리에서 값 바로 가져오기
+                    except Exception:
+                        origin_dist = (get_distance_lat(stn.start_loc, target.loc))  # 위의 딕셔너리에서 값 바로 가져오기
                     # wait_time = abs(min(0, target.start_time - stn.measures['total_time']))
-                    start_time = max(stn.measures['total_time'], target.start_time) + dist / stn.move_speed
-                    tardiness_time = max(0, (start_time + (target.rchg_amount / stn.rchg_speed) - target.time_wdw[1]))
-                    pri_dic[tardiness_time] = [target, stn, dist]
-                    target.dist_list.append(tardiness_time)
+                    if origin_dist < 50:  # m_stn의 초기 위치에서 벗어나지 않는다면 실행. 2km 이내
+                        start_time = max(stn.measures['total_time'], target.start_time) + dist / stn.move_speed
+                        tardiness_time = max(0, (start_time + (target.rchg_amount / stn.rchg_speed) - target.time_wdw[1]))
+                        pri_dic[tardiness_time] = [target, stn, dist]
+                        target.dist_list.append(tardiness_time)
 
 
         # pri_time = sorted(pri_dic.keys(), key=lambda x :(x, pri_dic[x][2]))

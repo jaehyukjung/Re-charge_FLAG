@@ -78,18 +78,18 @@ if __name__ == '__main__':
 
         i += 1
 
-    solution_dic = {'random': random_list[0],'jaehyuk': jae_list[0],'dist': only_dist_list[0]}
+    solution_dic = {'random': random_list[0],'solver': jae_list[0],'dist': only_dist_list[0]}
     df = pd.DataFrame(solution_dic)
     df.to_csv("tardiness_time_pd.csv", encoding='cp949')
 
-    solution_dic = {'random': random_list[1],'jaehyuk': jae_list[1],'dist': only_dist_list[1]}
+    solution_dic = {'random': random_list[1],'solver': jae_list[1],'dist': only_dist_list[1]}
     df = pd.DataFrame(solution_dic)
     df.to_csv("total_time_pd.csv", encoding='cp949')
 
-    solution_dic = {'random': random_list[2], 'jaehyuk': jae_list[2], 'dist': only_dist_list[2]}
+    solution_dic = {'random': random_list[2], 'solver': jae_list[2], 'dist': only_dist_list[2]}
     df = pd.DataFrame(solution_dic)
     df.to_csv("wait_time_pd.csv", encoding='cp949')
 
-    solution_dic = {'random': random_list[3], 'jaehyuk': jae_list[3], 'dist': only_dist_list[3]}
+    solution_dic = {'random': random_list[3], 'solver': jae_list[3], 'dist': only_dist_list[3]}
     df = pd.DataFrame(solution_dic)
     df.to_csv("total_distance_pd.csv", encoding='cp949')
