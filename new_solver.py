@@ -100,7 +100,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
 
 
         # pri_time = sorted(pri_dic.keys(), key=lambda x :(x, pri_dic[x][2]))
-        pri_time = sorted(pri_dic.keys(),key = lambda x:(x,pri_dic[x][2]))
+        pri_time = sorted(pri_dic.keys(), key=lambda x: (x, pri_dic[x][2]))
 
         return pri_dic[pri_time[0]][0], pri_dic[pri_time[0]][1]
     # ==================================================================
@@ -122,7 +122,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
         pri_req = min(not_completed_reqs,key = lambda x: (x.start_time))
         servable_stn = list(filter(lambda x: x.can_recharge is True, stn_list))
 
-        pri_req, pri_stn = priority(pri_req,servable_stn) # 재혁
+        pri_req, pri_stn = priority(pri_req, servable_stn)  # 재혁
 
         try:
              pri_stn.recharge(pri_req)
@@ -135,7 +135,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
 
     total_wait = 0
     total_distance = 0
-    max_stn = max(stn_list, key= lambda x: x.measures['total_time'])
+    max_stn = max(stn_list, key = lambda x: x.measures['total_time'])
     total_tardiness = 0
 
     for stn in stn_list:
@@ -149,7 +149,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
     solution['Objective'].append(total_tardiness)
     solution['Objective'].append(max_stn.measures['total_time'])
     solution['Objective'].append(total_wait)
-    solution['Objective'].append((total_distance))
+    solution['Objective'].append(total_distance)
 
 
     return solution
