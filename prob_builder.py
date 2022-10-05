@@ -1,7 +1,5 @@
 import copy
-import requests
-import json
-import pickle
+from distance import *
 
 
 class Prob_Instance:
@@ -23,18 +21,16 @@ class Request:
     def __init__(self, ID: int, Loc, Rchg_amount, department_time):
         self.id = ID
         self.loc = Loc
-        self.start_time1 = department_time
         self.rchg_amount = Rchg_amount
-        # ==================================================================
-        self.time_wdw = [department_time, department_time+Rchg_amount/50] #타임 윈도우 설정
+        self.time_wdw = [department_time, department_time]
         self.speed = 60
         self.dist_list = []
         self.tardiness = 0
-        # ==================================================================
+
     def initialize(self):
         self.done = False
         self.priority = -1
-        self.start_time = self.start_time1
+        self.start_time = self.time_wdw[0]
 
 class Station:
     def __init__(self, ID: int, Loc):
@@ -48,12 +44,12 @@ class Station:
     def initialize(self):
         self.now_capacity = self.max_capacity
         self.priority = -1
+        self.served_req = []
+        self.can_recharge = True
         self.measures = {}
         self.measures['total_distance'] = 0
         self.measures['total_wait'] = 0
-        self.served_req = []
-        self.can_recharge = True
-        self.measures['total_time'] = 0  # 추가
+        self.measures['total_time'] = 0
 
     def recharge(self, target: Request):
         with open('dist.p', 'rb') as file:
@@ -126,23 +122,5 @@ class MovableStation(Station):
         return str('Movable Station # ' + str(self.id))
 
 
-def get_distance_lat(coord1, coord2):
-    if coord2[0] == coord1[0] and coord2[1] == coord1[1]:
-        dist = 0
-
-    else:
-        lat1, lon1 = coord1
-        lat2, lon2 = coord2
-        r = requests.get(
-            f"http://router.project-osrm.org/route/v1/car/{lon1},{lat1};{lon2},{lat2}?overview=full""")
-        routes = json.loads(r.content)
-        route_1 = routes.get("routes")[0]
-        dist = route_1["distance"]
-
-    return dist / 1000  # Returns in kilometers
-
-
-def dic_key(coord1, coord2):
-    return str(coord1[0]) + str(coord1[1]) + 'to' + str(coord2[0]) + str(coord2[1])
 
 
