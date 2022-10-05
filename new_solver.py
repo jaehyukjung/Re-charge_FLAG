@@ -147,7 +147,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
 
     solution['Objective'] = []
     solution['Objective'].append(total_tardiness)
-    solution['Objective'].append(max_stn.measures['total_time'])
+    solution['Objective'].append(max_stn.measures['total_time'])  ## 모든 차량에 대한 완료시간 설정
     solution['Objective'].append(total_wait)
     solution['Objective'].append(total_distance)
 
