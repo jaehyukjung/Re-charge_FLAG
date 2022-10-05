@@ -125,7 +125,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
     total_tardiness = 0
 
     for stn in stn_list:
-        total_distance += stn.measures['total_distance']
+        total_distance += stn.measures['total_distance']   # 이동형 충전소의 거리를 고려한 total distance
         total_wait += stn.measures['total_wait']
 
     for req in req_list:
