@@ -2,7 +2,7 @@ import os.path
 from prob_builder import *
 from typing import List
 import pickle
-import s_solver
+import old_solver_4
 PENALTY = 1000000
 
 
