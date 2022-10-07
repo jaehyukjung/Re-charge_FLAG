@@ -14,7 +14,7 @@
 <center>
     <div style = "padding: 10px 1px 2px 10px;">
         <img src="sprites/img.png" width="270" height="400"/>
-        <img src="spirtes/img_1.png" width="270" height="400"/>
+        <img src="sprites/img_1.png" width="270" height="400"/>
     </div>
 </center>
 
