@@ -13,8 +13,8 @@
 ### 알고리즘 결과 지표:
 <center>
     <div style = "padding: 10px 1px 2px 10px;">
-        <img src="img.png" width="270" height="400"/>
-        <img src="img_1.png" width="270" height="400"/>
+        <img src="sprites/img.png" width="270" height="400"/>
+        <img src="spirtes/img_1.png" width="270" height="400"/>
     </div>
 </center>
 
