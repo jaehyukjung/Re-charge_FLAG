@@ -2,7 +2,6 @@ import random
 from prob_builder import *
 from typing import List
 from distance import distance_diction
-PENALTY = 1000000
 
 def random_rule_solver(instance: Prob_Instance) -> dict:
     solution = {}
