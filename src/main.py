@@ -1,6 +1,6 @@
 import random
 import prob_builder as prob
-import solver, old_solver_1, old_solver_4, old_solver_3, old_solver_2, new_solver, dist_solver
+import random_solver, old_solver_1, old_solver_4, old_solver_3, old_solver_2, new_solver, dist_solver
 import pandas as pd
 
 def random_LoadProb(n):
