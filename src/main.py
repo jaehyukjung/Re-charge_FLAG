@@ -1,6 +1,6 @@
 import random
 import prob_builder as prob
-import random_solver, old_solver_1, old_solver_4, old_solver_3, old_solver_2, new_solver, dist_solver
+import random_solver, new_solver, dist_solver
 import pandas as pd
 
 def random_LoadProb(n):
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         Print_LoadProb(n)
 
         Sample = random_LoadProb(n)
-        Solution = solver.random_rule_solver(Sample)
+        Solution = random_solver.random_rule_solver(Sample)
         for j in range(3):
             random_list[j].append(round(Solution['Objective'][j],4))
 
