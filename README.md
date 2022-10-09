@@ -10,6 +10,7 @@
 #### 김수빈 : github.com/sb0702
 
 ---
+### 지역 범위 : 서울 사대문 내에 위치한 차량과 충전소로 한정.
 ### 알고리즘 결과 지표:
 <center>
     <div style = "padding: 10px 1px 2px 10px;">
