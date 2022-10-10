@@ -11,15 +11,15 @@ def random_LoadProb(n):
 
     ThisProb = prob.Prob_Instance()
     for i in range(random_req):
-        ThisProb.req_list.append(prob.Request(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 70), random.uniform(0.001, 3.99)))
+        ThisProb.req_list.append(prob.Request(i+1, [random.uniform(37.3335, 37.3422), random.uniform(126.5831, 127.0160)], random.uniform(2, 70), random.uniform(0.001, 3.99)))
     for i in range(int(random_req/2)):
-        ThisProb.req_list.append(prob.Request(random_req+1+i, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], random.uniform(2, 70), random.uniform(1.001, 1.99)))
+        ThisProb.req_list.append(prob.Request(random_req+1+i, [random.uniform(37.3335, 37.3422), random.uniform(126.5831, 127.0160)], random.uniform(2, 70), random.uniform(1.001, 1.99)))
 
     for i in range(random_stn):
-        ThisProb.stn_list.append(prob.Station(i+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)]))
+        ThisProb.stn_list.append(prob.Station(i+1,[random.uniform(37.3335, 37.3422), random.uniform(126.5831, 127.0160)]))
 
     for i in range(random_Mstn):
-        ThisProb.stn_list.append(prob.MovableStation(i+random_stn+1, [random.uniform(37.4, 37.9), random.uniform(127.0, 127.9)], moveSpeed=60))
+        ThisProb.stn_list.append(prob.MovableStation(i+random_stn+1,[random.uniform(37.3335, 37.3422), random.uniform(126.5831, 127.0160)], moveSpeed=60))
 
     return ThisProb
 
