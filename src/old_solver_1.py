@@ -21,7 +21,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
     for stn in stn_list:
         stn.initialize()
 
-    if not os.path.exists('dist.p'):
+    if not os.path.exists('../dist.p'):
         distance_dic = {}
 
         for req in req_list:
@@ -36,11 +36,11 @@ def rule_solver(instance: Prob_Instance) -> dict:
                     distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
 
 
-        with open('dist.p', 'wb') as file:
+        with open('../dist.p', 'wb') as file:
             pickle.dump(distance_dic, file)
 
     else:
-        with open('dist.p', 'rb') as file:
+        with open('../dist.p', 'rb') as file:
             distance_dic = pickle.load(file)
 
         for req in req_list:
@@ -55,7 +55,7 @@ def rule_solver(instance: Prob_Instance) -> dict:
                     distance_dic[dic_key(req1.loc, req2.loc)] = get_distance_lat(req1.loc, req2.loc)
                     distance_dic[dic_key(req2.loc, req1.loc)] = get_distance_lat(req2.loc, req1.loc)
 
-        with open('dist.p', 'wb') as file:
+        with open('../dist.p', 'wb') as file:
             pickle.dump(distance_dic, file)
 
     def priority(target_list: List[Request], station_list: List[Station]):
