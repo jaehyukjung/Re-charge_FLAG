@@ -6,7 +6,6 @@ from distance import distance_diction
 def random_rule_solver(instance: Prob_Instance) -> dict:
     solution = {}
     solution['Problem'] = instance.deepcopy()
-
     req_list = instance.req_list
     req: Request
     for req in req_list:
@@ -22,7 +21,6 @@ def random_rule_solver(instance: Prob_Instance) -> dict:
     def random_priority(target, station_list: List[Station]):
         for stn in station_list:
             stn.priority = random.randint(1,1000000)
-
         return target, min(station_list, key = lambda x: x.priority)
 
     for req in req_list:
@@ -31,9 +29,7 @@ def random_rule_solver(instance: Prob_Instance) -> dict:
                 req.dist_list.append(distance_dic[dic_key(stn.loc, req.loc)])
             else:
                 req.dist_list.append(distance_dic[dic_key(req.loc, stn.loc)])
-
         spare_time = (sum(req.dist_list)/len(req.dist_list)) / req.speed
-
         req.time_wdw[1] += spare_time
 
     while any(req.done is False for req in req_list):

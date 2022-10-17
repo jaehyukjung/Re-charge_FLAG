@@ -52,7 +52,7 @@ class Station:
         self.measures['total_time'] = 0
 
     def recharge(self, target: Request):
-        with open('dist.p', 'rb') as file:
+        with open('../dist.p', 'rb') as file:
             distance_dic = pickle.load(file)
 
         if not self.doable(target):
@@ -93,7 +93,7 @@ class MovableStation(Station):
         Station.initialize(self)
 
     def recharge(self, target: Request):
-        with open('dist.p', 'rb') as file:
+        with open('../dist.p', 'rb') as file:
             distance_dic = pickle.load(file)
 
         if not self.doable(target): raise Exception('Infeasible Recharging!')
